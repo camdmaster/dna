@@ -1,7 +1,9 @@
 package dna.spa;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -84,11 +86,14 @@ public class App
     	return graph;
     }
     
-    private static void printVertexOrderedByCoverage(Graph graph) {
+    private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\20170103_redundant.txt"));
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
     	for(Vertex vertex: list) {
+    		bw.write(vertex.toString());
     		System.out.println(vertex.toString());
     	}
+    	bw.close();
     }
     
     private static void traverseGraph(Graph graph) {
