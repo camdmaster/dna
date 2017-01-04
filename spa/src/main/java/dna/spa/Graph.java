@@ -93,6 +93,14 @@ public class Graph {
 		return candidates;
 	}
 	
+	public List<Vertex> getVerticeOrderedByCoverage() {
+		List<Vertex> list = new ArrayList<Vertex>(vertexMap.values());
+		Collections.sort(list);
+		Collections.reverse(list);
+		
+		return list;
+	}
+	
 	public String traverseV1(Vertex vertex, StringBuilder string) {
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;

@@ -1,23 +1,18 @@
 package dna.spa;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import dna.spa.io.FastaReader;
-import dna.spa.redundancy.IterativeSequenceChecker;
 
 
 
 /**
- * Hello world!
+ * Start Point
  *
  */
 public class App 
@@ -28,20 +23,25 @@ public class App
     	ArrayList<Sequence> seqList = null;
     	
     	try {
-			seqList = makeTargetSequence();
-			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
-			ic.findPattern();
-//			makeGraph(seqList);
+    		seqList = makeTargetSequence();
+//    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\20161216_protein_3_read.faa");
+//    		seqList = reader.read();
+    		
+//			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
+//			ic.findPattern();
+			
+    		Graph graph = makeGraph(seqList);
+    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
     }
     
-    private static void makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
+    private static Graph makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
     	// make graph
     	Graph graph = new Graph();
-    	int vertexLength = 10;
+    	int vertexLength = 12;
     	int edgeLength = vertexLength + 1;
     	for(Sequence seq: sequenceList) {
     		String string = seq.getString();
@@ -81,6 +81,17 @@ public class App
     	}
     	graph.setFValue();
     	
+    	return graph;
+    }
+    
+    private static void printVertexOrderedByCoverage(Graph graph) {
+    	List<Vertex> list = graph.getVerticeOrderedByCoverage();
+    	for(Vertex vertex: list) {
+    		System.out.println(vertex.toString());
+    	}
+    }
+    
+    private static void traverseGraph(Graph graph) {
     	// find seed
     	List<Vertex> seeds = graph.getSeedVertex();
     	
@@ -93,7 +104,6 @@ public class App
         	
         	System.out.println(i + "\t" + whole);
     	}
-    	System.out.println("end");
     }
     
     
@@ -124,8 +134,8 @@ public class App
     		count++;
     		System.out.println(subName + " " + count);
     		
-    		if(count == 68)
-    			break;
+//    		if(count == 1)
+//    			break;
     	}
     	
     	return targetSeq;
