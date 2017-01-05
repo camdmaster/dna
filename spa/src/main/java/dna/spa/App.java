@@ -25,9 +25,9 @@ public class App
     	ArrayList<Sequence> seqList = null;
     	
     	try {
-    		seqList = makeTargetSequence();
-//    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\20161216_protein_3_read.faa");
-//    		seqList = reader.read();
+//    		seqList = makeTargetSequence();
+    		FastaReader reader = new FastaReader("D:\\download\\NC_021485.faa");
+    		seqList = reader.read();
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
 //			ic.findPattern();
@@ -38,6 +38,7 @@ public class App
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
+    	System.out.println("Done.");
     }
     
     private static Graph makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
@@ -45,23 +46,27 @@ public class App
     	Graph graph = new Graph();
     	int vertexLength = 12;
     	int edgeLength = vertexLength + 1;
+    	
     	for(Sequence seq: sequenceList) {
     		String string = seq.getString();
     		int sequenceLength = string.length();
+    		
+    		String v = string.substring(0, vertexLength);
+    		Vertex vertex = null;
+        	if(graph.existVertex(v)) {
+    			vertex = graph.getVertex(v);
+    			graph.addVertexCoverage(v);
+    		} else {
+    			vertex = new Vertex(v);
+    			graph.addVertex(vertex);
+    		}
     		for(int i=0; i<sequenceLength-vertexLength; i++) {
     			String v1 = string.substring(i, i+vertexLength);
     			String v2 = string.substring(i+1, i+vertexLength+1);
     			String ed = string.substring(i, i+edgeLength);
+    			
     			Vertex vertex1 = null;
     			Vertex vertex2 = null;
-    			
-    			if(graph.existVertex(v1)) {
-    				vertex1 = graph.getVertex(v1);
-    				graph.addVertexCoverage(v1);
-    			} else {
-    				vertex1 = new Vertex(v1);
-    				graph.addVertex(vertex1);
-    			}
     			
     			if(graph.existVertex(v2)) {
     				vertex2 = graph.getVertex(v2);
@@ -71,6 +76,7 @@ public class App
     				graph.addVertex(vertex2);
     			}
     			
+    			vertex1 = graph.getVertex(v1);
     			if(graph.existEdge(ed)) {
     				graph.addEdgeCoverage(ed);
     			} else {
@@ -87,11 +93,11 @@ public class App
     }
     
     private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\20170103_redundant.txt"));
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("D:\\Dropbox\\DNA\\20160929_SPA\\data\\redundant.txt"));
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
     	for(Vertex vertex: list) {
-    		bw.write(vertex.toString());
-    		System.out.println(vertex.toString());
+    		bw.write(vertex.toString() + ", Edge=" + vertex.getEdgeList().size() + "\r\n");
+    		System.out.println(vertex.toString() + ", Edge=" + vertex.getEdgeList().size());
     	}
     	bw.close();
     }
