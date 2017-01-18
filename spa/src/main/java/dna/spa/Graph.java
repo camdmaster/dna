@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 public class Graph {
 	
@@ -101,7 +102,15 @@ public class Graph {
 		return list;
 	}
 	
-	public String traverseV1(Vertex vertex, StringBuilder string) {
+	public List<Edge> getEdgeList() {
+		List<Edge> list = new ArrayList<Edge>(edgeMap.values());
+		return list;
+	}
+	
+	public String traverseV1(Vertex vertex, StringBuilder string, Stack<Vertex> stack) {
+//		if(stack == null)
+//			return null;
+		
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
 		int maxCoverage = 0;
@@ -123,45 +132,74 @@ public class Graph {
 		
 		if(extVertex != null) {
 			string.insert(0, extVertex.getString().substring(0,1));
-//			System.out.println(string);
-			traverseV1(extVertex, string);
+			stack.push(extVertex);
+//			System.out.println("\t" + string);
+			traverseV1(extVertex, string, stack);
 		} 
 //		else {
-//			System.out.println(string);
+//			if(vertex.getEdgeList().size() == 1) {
+//				System.out.println("t:\t" + string);	
+//			}
+//			string.deleteCharAt(0);
+//			stack.pop();
+//			if(stack.size() == 0)
+//				return string.toString();
+//			Vertex prev = stack.peek();
+//			traverseV1(prev, string, stack);
 //		}
 		
+		System.out.println(string.toString());
 		return string.toString();
 	}
 	
-	public String traverseV2(Vertex vertex, StringBuilder string) {
+	public String traverseV2(Vertex vertex, StringBuilder string, Stack<Vertex> stack) {
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
 		int maxCoverage = 0;
 		double maxFValue = 0;
+		Vertex tmpVertex = null;
 		for(Edge edge: edgeList) {
 			if(edge.getV1().equals(vertex) && !edge.visited) {
-				Vertex tmpVertex = edge.getV2();
-				if((tmpVertex.getCoverage() > maxCoverage) ||
-						((tmpVertex.getCoverage() == maxCoverage) && tmpVertex.f_value > maxFValue) ) {
-					maxCoverage = tmpVertex.getCoverage();
-					maxFValue = tmpVertex.f_value;
-					extVertex = tmpVertex;
-					
-					edge.visited = true;
-					extVertex.visited = true;
-				} 
+				tmpVertex = edge.getV2();
+				edge.visited = true;
+				string.append(tmpVertex.getString().substring(tmpVertex.getString().length()-1));
+				stack.push(tmpVertex);
+				traverseV2(tmpVertex, string, stack);
+//				if((tmpVertex.getCoverage() > maxCoverage) ||
+//						((tmpVertex.getCoverage() == maxCoverage) && tmpVertex.f_value > maxFValue) ) {
+//					maxCoverage = tmpVertex.getCoverage();
+//					maxFValue = tmpVertex.f_value;
+//					extVertex = tmpVertex;
+//					
+//					edge.visited = true;
+//					extVertex.visited = true;
+//					
+//					traverseV2(extVertex, string);
+//				} 
 			}
 		}
 		
-		if(extVertex != null) {
-			string.append(extVertex.getString().substring(extVertex.getString().length()-1));
+//		if(extVertex != null) {
+//			string.append(extVertex.getString().substring(extVertex.getString().length()-1));
 //			System.out.println(string);
-			traverseV2(extVertex, string);
-		} 
+////			traverseV2(extVertex, string);
+//		} 
 //		else {
-//			System.out.println(string);
+//			System.out.println("\t" + string);
 //		}
-		
+		if(tmpVertex == null) {
+			StringBuilder sb = new StringBuilder(stack.get(0).getString());
+			for(int i=1; i<stack.size(); i++) {
+				Vertex v = stack.get(i);
+				sb.append(v.getString().substring(v.getString().length()-1));
+			}
+			System.out.println("\t" + sb.toString());	
+		}
+		stack.pop();
 		return string.toString();
+	}
+	
+	private void depthFirstSearch() {
+		
 	}
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Stack;
 
 import dna.spa.io.FastaReader;
 
@@ -26,14 +27,15 @@ public class App
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("D:\\download\\NC_021485.faa");
+    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\NC_021485.faa");
     		seqList = reader.read();
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
 //			ic.findPattern();
 			
     		Graph graph = makeGraph(seqList);
-    		printVertexOrderedByCoverage(graph);
+    		traverseGraph(graph);
+//    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -93,7 +95,7 @@ public class App
     }
     
     private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("D:\\Dropbox\\DNA\\20160929_SPA\\data\\redundant.txt"));
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("f:\\Dropbox\\DNA\\20160929_SPA\\data\\redundant.txt"));
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
     	for(Vertex vertex: list) {
     		bw.write(vertex.toString() + ", Edge=" + vertex.getEdgeList().size() + "\r\n");
@@ -106,12 +108,15 @@ public class App
     	// find seed
     	List<Vertex> seeds = graph.getSeedVertex();
     	
-    	for(int i=0; i<seeds.size(); i++) {
+    	for(int i=0; i<2; i++) {
         	// traverse right
     		Vertex seed = seeds.get(i);
-        	String whole = graph.traverseV1(seed, new StringBuilder(seed.getString()));
-        	whole = graph.traverseV2(seed, new StringBuilder(whole));
-        	graph.resetVisited();
+    		Stack<Vertex> stack = new Stack<Vertex>();
+    		stack.push(seed);
+//        	String whole = graph.traverseV1(seed, new StringBuilder(seed.getString()), stack);
+//        	String whole = graph.traverseV2(seed, new StringBuilder(whole));
+    		String whole = graph.traverseV2(seed, new StringBuilder(seed.getString()), stack);
+//        	graph.resetVisited();
         	
         	System.out.println(i + "\t" + whole);
     	}
