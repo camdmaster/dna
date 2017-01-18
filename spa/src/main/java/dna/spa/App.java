@@ -25,14 +25,19 @@ public class App
     	ArrayList<Sequence> seqList = null;
     	
     	try {
-//    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("D:\\download\\NC_021485.faa");
-    		seqList = reader.read();
+    		seqList = makeTargetSequence();
+//    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Streptococcus_pyogenes_A20_uid178106/NC_018936.faa");
+//    		seqList = reader.read();
+//    		reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Staphylococcus_aureus_04_02981_uid161969/NC_017340.faa");
+//    		seqList.addAll(reader.read());
+//    		reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
+//    		seqList.addAll(reader.read());
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
 //			ic.findPattern();
 			
     		Graph graph = makeGraph(seqList);
+//    		traverseGraph(graph);
     		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
@@ -93,12 +98,24 @@ public class App
     }
     
     private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("D:\\Dropbox\\DNA\\20160929_SPA\\data\\redundant.txt"));
+//    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Streptococcus_pyogenes_A20_uid178106_edge.out"));
+//    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Staphylococcus_aureus_04_02981_uid161969_edge.out"));
+//    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Staphylococcus_Streptococcus_Clostridium_edge.out"));
+//    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Clostridium_difficile_630_uid57679_edge.out"));
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/genus_vertex.out"));
+    	
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
     	for(Vertex vertex: list) {
     		bw.write(vertex.toString() + ", Edge=" + vertex.getEdgeList().size() + "\r\n");
-    		System.out.println(vertex.toString() + ", Edge=" + vertex.getEdgeList().size());
+//    		System.out.println(vertex.toString() + ", Edge=" + vertex.getEdgeList().size());
     	}
+    	bw.close();
+    	
+//    	List<Edge> list = graph.getEdgeList();
+//    	for(Edge edge: list) {
+//    		bw.write(edge.getV1().getString() + "\t" + edge.getV2().getString() + "\t" + edge.getCoverage() + "\r\n");
+////    		System.out.println(edge.getV1().getString() + "\t" + edge.getV2().getString() + "\t" + edge.getCoverage());
+//    	}
     	bw.close();
     }
     
@@ -119,7 +136,7 @@ public class App
     
     
     private static ArrayList<Sequence> makeTargetSequence() throws IOException {
-    	File dir = new File("F:\\학교\\all_faa");
+    	File dir = new File("/data2/db/ncbi/bacteria_150414/all_faa");
     	HashSet<String> speciesName = new HashSet<String>();
     	ArrayList<Sequence> targetSeq = new ArrayList<Sequence>();
     	int count = 0;

@@ -101,6 +101,10 @@ public class Graph {
 		return list;
 	}
 	
+	public List<Edge> getEdgeList() {
+		return new ArrayList<Edge>(edgeMap.values());
+	}
+	
 	public String traverseV1(Vertex vertex, StringBuilder string) {
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
