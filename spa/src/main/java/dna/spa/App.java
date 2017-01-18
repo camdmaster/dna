@@ -27,7 +27,7 @@ public class App
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\NC_021485.faa");
+    		FastaReader reader = new FastaReader("/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/fgs.faa");
     		seqList = reader.read();
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
@@ -95,7 +95,7 @@ public class App
     }
     
     private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("f:\\Dropbox\\DNA\\20160929_SPA\\data\\redundant.txt"));
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/redundant.txt"));
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
     	for(Vertex vertex: list) {
     		bw.write(vertex.toString() + ", Edge=" + vertex.getEdgeList().size() + "\r\n");
@@ -104,22 +104,42 @@ public class App
     	bw.close();
     }
     
-    private static void traverseGraph(Graph graph) {
+    private static void traverseGraph(Graph graph) throws IOException {
     	// find seed
     	List<Vertex> seeds = graph.getSeedVertex();
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/traverse_dfs.txt"));
     	
-    	for(int i=0; i<2; i++) {
+    	for(int i=0; i<50; i++) {
         	// traverse right
     		Vertex seed = seeds.get(i);
+    		seed.visited = true;
+    		if(graph.getVertex(seed.getString()) == null)
+    			continue;
     		Stack<Vertex> stack = new Stack<Vertex>();
     		stack.push(seed);
 //        	String whole = graph.traverseV1(seed, new StringBuilder(seed.getString()), stack);
 //        	String whole = graph.traverseV2(seed, new StringBuilder(whole));
-    		String whole = graph.traverseV2(seed, new StringBuilder(seed.getString()), stack);
+//    		String whole = graph.traverseV2(seed, new StringBuilder(seed.getString()), stack);
 //        	graph.resetVisited();
-        	
-        	System.out.println(i + "\t" + whole);
+    		int count = i+1;
+    		bw.write("seed " + count + ": " + seed.toString() + "\r\n");
+    		System.out.println("seed " + count + ": " + seed.toString());
+    		ArrayList<String> seqListPre = new ArrayList<String>();
+    		graph.traverseV1(seed, new StringBuilder(seed.getString()), stack, seqListPre);
+    		stack = new Stack<Vertex>();
+    		stack.push(seed);
+    		ArrayList<String> seqListPost = new ArrayList<String>();
+    		graph.traverseV2(seed, new StringBuilder(seed.getString()), stack, seqListPost);
+    		for(String seq1: seqListPre) {
+    			for(String seq2: seqListPost) {
+    				bw.write(seq1 + seq2.substring(seed.getString().length()) + "\r\n");
+    				System.out.println(seq1 + seq2.substring(seed.getString().length()));
+    			}
+    		}
+        	graph.removeVisitedGraph();
+//        	System.out.println(i + "\t" + whole);
     	}
+    	bw.close();
     }
     
     
