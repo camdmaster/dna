@@ -115,8 +115,10 @@ public class Graph {
 //		int maxCoverage = 0;
 //		double maxFValue = 0;
 		for(Edge edge: edgeList) {
-			if(edge.getV2().equals(vertex) && !edge.visited) {
+			if(edge.getV2().equals(vertex)) {
 				tmpVertex = edge.getV1();
+				if(stack.contains(tmpVertex))
+					continue;
 				edge.visited = true;
 				tmpVertex.visited = true;
 				string.append(tmpVertex.getString().substring(tmpVertex.getString().length()-1));
@@ -146,8 +148,10 @@ public class Graph {
 //		double maxFValue = 0;
 		Vertex tmpVertex = null;
 		for(Edge edge: edgeList) {
-			if(edge.getV1().equals(vertex) && !edge.visited) {
+			if(edge.getV1().equals(vertex)) {
 				tmpVertex = edge.getV2();
+				if(stack.contains(tmpVertex))
+					continue;
 				edge.visited = true;
 				tmpVertex.visited = true;
 				string.append(tmpVertex.getString().substring(tmpVertex.getString().length()-1));
@@ -182,22 +186,16 @@ public class Graph {
 	
 	public void removeVisitedGraph() {
 		List<Edge> elist = new ArrayList<Edge>(edgeMap.values());
-//		List<Edge> visitedeList = new ArrayList<Edge>(); 
 		for(Edge e: elist) {
 			if(e.visited)
 				edgeMap.remove(e.getString());
-//				visitedeList.add(e);
 		}
-//		elist.removeAll(visitedeList);
 		
 		List<Vertex> vlist = new ArrayList<Vertex>(vertexMap.values());
-//		List<Vertex> visitedvList = new ArrayList<Vertex>(); 
 		for(Vertex v: vlist) {
 			if(v.visited)
 				vertexMap.remove(v.getString());
-//				visitedvList.add(v);
 		}
-//		vlist.removeAll(visitedvList);
 	}
 	
 }

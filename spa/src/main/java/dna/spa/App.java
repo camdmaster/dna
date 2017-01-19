@@ -2,11 +2,11 @@ package dna.spa;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -27,7 +27,7 @@ public class App
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/fgs.faa");
+    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\fgs.noindel.faa");
     		seqList = reader.read();
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
@@ -106,21 +106,20 @@ public class App
     
     private static void traverseGraph(Graph graph) throws IOException {
     	// find seed
-    	List<Vertex> seeds = graph.getSeedVertex();
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/traverse_dfs.txt"));
+//    	List<Vertex> seeds = graph.getSeedVertex();
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\traverse_fgs_noindel.txt"));
     	
-    	for(int i=0; i<50; i++) {
+    	for(int i=0; i<500; i++) {
         	// traverse right
-    		Vertex seed = seeds.get(i);
+    		Vertex seed = getSeed(graph);
+//    		Vertex seed = seeds.get(i);
+    		if(seed == null) break;
     		seed.visited = true;
     		if(graph.getVertex(seed.getString()) == null)
     			continue;
+    		
     		Stack<Vertex> stack = new Stack<Vertex>();
     		stack.push(seed);
-//        	String whole = graph.traverseV1(seed, new StringBuilder(seed.getString()), stack);
-//        	String whole = graph.traverseV2(seed, new StringBuilder(whole));
-//    		String whole = graph.traverseV2(seed, new StringBuilder(seed.getString()), stack);
-//        	graph.resetVisited();
     		int count = i+1;
     		bw.write("seed " + count + ": " + seed.toString() + "\r\n");
     		System.out.println("seed " + count + ": " + seed.toString());
@@ -140,6 +139,20 @@ public class App
 //        	System.out.println(i + "\t" + whole);
     	}
     	bw.close();
+    }
+    
+    private static Vertex getSeed(Graph graph) {
+    	Vertex seed = null;
+    	Iterator<Vertex> iter = graph.vertexMap.values().iterator();
+    	while(seed == null && iter.hasNext()) {
+//    	if(iter.hasNext()) {
+    		try {
+        		seed = iter.next();	
+    		} catch(Exception e) {
+    			System.out.println("null seed");
+    		}	
+    	}
+    	return seed;
     }
     
     
