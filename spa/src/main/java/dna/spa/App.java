@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Stack;
 
 import dna.spa.io.FastaReader;
+import dna.spa.io.FastaWriter;
 
 
 
@@ -27,7 +28,7 @@ public class App
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\fgs.noindel.faa");
+    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\NC_021485.faa");
     		seqList = reader.read();
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
@@ -107,7 +108,7 @@ public class App
     private static void traverseGraph(Graph graph) throws IOException {
     	// find seed
 //    	List<Vertex> seeds = graph.getSeedVertex();
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\traverse_fgs_noindel.txt"));
+    	FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\traverse_fgs_noindel.fasta");
     	
     	for(int i=0; i<500; i++) {
         	// traverse right
@@ -121,7 +122,7 @@ public class App
     		Stack<Vertex> stack = new Stack<Vertex>();
     		stack.push(seed);
     		int count = i+1;
-    		bw.write("seed " + count + ": " + seed.toString() + "\r\n");
+//    		bw.write("seed " + count + ": " + seed.toString() + "\r\n");
     		System.out.println("seed " + count + ": " + seed.toString());
     		ArrayList<String> seqListPre = new ArrayList<String>();
     		graph.traverseV1(seed, new StringBuilder(seed.getString()), stack, seqListPre);
@@ -129,10 +130,16 @@ public class App
     		stack.push(seed);
     		ArrayList<String> seqListPost = new ArrayList<String>();
     		graph.traverseV2(seed, new StringBuilder(seed.getString()), stack, seqListPost);
+    		int countTree = 1;
     		for(String seq1: seqListPre) {
     			for(String seq2: seqListPost) {
-    				bw.write(seq1 + seq2.substring(seed.getString().length()) + "\r\n");
-    				System.out.println(seq1 + seq2.substring(seed.getString().length()));
+    				String header = "seed " + count + ": " + seed.toString() + " " + countTree;
+    				String string = seq1 + seq2.substring(seed.getString().length());
+    				Sequence seq = new Sequence(header, string);
+    				countTree++;
+    				bw.write(seq);
+//    				bw.write(seq1 + seq2.substring(seed.getString().length()) + "\r\n");
+//    				System.out.println(seq1 + seq2.substring(seed.getString().length()));
     			}
     		}
         	graph.removeVisitedGraph();
