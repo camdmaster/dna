@@ -22,16 +22,21 @@ public class App
 {
     public static void main( String[] args )
     {
+    	// start time
+    	long startTime = System.nanoTime();
+    	
     	// target sequence
     	ArrayList<Sequence> seqList = null;
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Streptococcus_pyogenes_A20_uid178106/NC_018936.faa");
+//    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
+//    		seqList = reader.read();
+    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Staphylococcus_aureus_04_02981_uid161969/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa");
     		seqList = reader.read();
-//    		reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Staphylococcus_aureus_04_02981_uid161969/NC_017340.faa");
 //    		seqList.addAll(reader.read());
-//    		reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
+//    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
+//    		seqList = reader.read();
 //    		seqList.addAll(reader.read());
 
     		
@@ -45,6 +50,11 @@ public class App
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
+    	
+    	long endTime = System.nanoTime();
+    	
+    	long lTime = endTime - startTime;
+    	System.out.println("TIME : " + lTime/1000000.0 + "(ms)");
     	System.out.println("Done.");
     }
     
@@ -125,9 +135,10 @@ public class App
     	// find seed
 //    	List<Vertex> seeds = graph.getSeedVertex();
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\traverse_fgs_noindel.txt"));
-    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/dfs_Streptococcus_pyogenes_A20_uid178106.out"));
+//    	BufferedWriter bw = new BufferedWriter(new FileWriter("/data1/yjseo/dfs_Clostridium_difficile_630_uid57679.out"));
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa.asb"));
     	
-    	for(int i=0; i<500; i++) {
+    	for(int i=0; i<10000; i++) {
         	// traverse right
     		Vertex seed = getSeed(graph);
 //    		Vertex seed = seeds.get(i);
@@ -150,7 +161,7 @@ public class App
     		for(String seq1: seqListPre) {
     			for(String seq2: seqListPost) {
     				bw.write(seq1 + seq2.substring(seed.getString().length()) + "\r\n");
-    				System.out.println(seq1 + seq2.substring(seed.getString().length()));
+//    				System.out.println(seq1 + seq2.substring(seed.getString().length()));
     			}
     		}
         	graph.removeVisitedGraph();
