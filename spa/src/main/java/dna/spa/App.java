@@ -2,12 +2,13 @@ package dna.spa;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 import dna.spa.io.FastaReader;
 
@@ -25,20 +26,21 @@ public class App
     	ArrayList<Sequence> seqList = null;
     	
     	try {
-    		seqList = makeTargetSequence();
-//    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Streptococcus_pyogenes_A20_uid178106/NC_018936.faa");
-//    		seqList = reader.read();
+//    		seqList = makeTargetSequence();
+    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Streptococcus_pyogenes_A20_uid178106/NC_018936.faa");
+    		seqList = reader.read();
 //    		reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Staphylococcus_aureus_04_02981_uid161969/NC_017340.faa");
 //    		seqList.addAll(reader.read());
 //    		reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
 //    		seqList.addAll(reader.read());
+
     		
 //			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
 //			ic.findPattern();
 			
     		Graph graph = makeGraph(seqList);
-//    		traverseGraph(graph);
-    		printVertexOrderedByCoverage(graph);
+    		traverseGraph(graph);
+//    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -103,7 +105,7 @@ public class App
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Staphylococcus_Streptococcus_Clostridium_edge.out"));
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Clostridium_difficile_630_uid57679_edge.out"));
     	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/genus_vertex.out"));
-    	
+
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
     	for(Vertex vertex: list) {
     		bw.write(vertex.toString() + ", Edge=" + vertex.getEdgeList().size() + "\r\n");
@@ -119,19 +121,56 @@ public class App
     	bw.close();
     }
     
-    private static void traverseGraph(Graph graph) {
+    private static void traverseGraph(Graph graph) throws IOException {
     	// find seed
-    	List<Vertex> seeds = graph.getSeedVertex();
+//    	List<Vertex> seeds = graph.getSeedVertex();
+//    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\traverse_fgs_noindel.txt"));
+    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/dfs_Streptococcus_pyogenes_A20_uid178106.out"));
     	
-    	for(int i=0; i<seeds.size(); i++) {
+    	for(int i=0; i<500; i++) {
         	// traverse right
-    		Vertex seed = seeds.get(i);
-        	String whole = graph.traverseV1(seed, new StringBuilder(seed.getString()));
-        	whole = graph.traverseV2(seed, new StringBuilder(whole));
-        	graph.resetVisited();
-        	
-        	System.out.println(i + "\t" + whole);
+    		Vertex seed = getSeed(graph);
+//    		Vertex seed = seeds.get(i);
+    		if(seed == null) break;
+    		seed.visited = true;
+    		if(graph.getVertex(seed.getString()) == null)
+    			continue;
+    		
+    		Stack<Vertex> stack = new Stack<Vertex>();
+    		stack.push(seed);
+    		int count = i+1;
+    		bw.write("seed " + count + ": " + seed.toString() + "\r\n");
+    		System.out.println("seed " + count + ": " + seed.toString());
+    		ArrayList<String> seqListPre = new ArrayList<String>();
+    		graph.traverseV1(seed, new StringBuilder(seed.getString()), stack, seqListPre);
+    		stack = new Stack<Vertex>();
+    		stack.push(seed);
+    		ArrayList<String> seqListPost = new ArrayList<String>();
+    		graph.traverseV2(seed, new StringBuilder(seed.getString()), stack, seqListPost);
+    		for(String seq1: seqListPre) {
+    			for(String seq2: seqListPost) {
+    				bw.write(seq1 + seq2.substring(seed.getString().length()) + "\r\n");
+    				System.out.println(seq1 + seq2.substring(seed.getString().length()));
+    			}
+    		}
+        	graph.removeVisitedGraph();
+//        	System.out.println(i + "\t" + whole);
     	}
+    	bw.close();
+    }
+    
+    private static Vertex getSeed(Graph graph) {
+    	Vertex seed = null;
+    	Iterator<Vertex> iter = graph.vertexMap.values().iterator();
+    	while(seed == null && iter.hasNext()) {
+//    	if(iter.hasNext()) {
+    		try {
+        		seed = iter.next();	
+    		} catch(Exception e) {
+    			System.out.println("null seed");
+    		}	
+    	}
+    	return seed;
     }
     
     
