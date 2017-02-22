@@ -23,19 +23,24 @@ public class App
 {
     public static void main( String[] args )
     {
-    	// target sequence
-    	ArrayList<Sequence> seqList = null;
+    	// read
+    	ArrayList<Sequence> readList = null;
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\NC_021485.faa");
-    		seqList = reader.read();
+    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\20170202\\NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
+    		readList = reader.read();
     		
-//			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
-//			ic.findPattern();
-			
-    		Graph graph = makeGraph(seqList);
-    		traverseGraph(graph);
+    		// depth first search
+//    		Graph graph = makeGraph(readList);
+//    		traverseGraph(graph);
+
+    		// SPA based search
+    		Graph graph = makeGraph(readList);
+    		SequenceGenerator sg = new SequenceGenerator(graph);
+    		sg.traverseGraph();
+    		
+    		
 //    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
@@ -153,8 +158,7 @@ public class App
     	Iterator<Vertex> iter = graph.vertexMap.values().iterator();
     	while(seed == null && iter.hasNext()) {
 //    	if(iter.hasNext()) {
-    		try {
-        		seed = iter.next();	
+    		try {        		seed = iter.next();	
     		} catch(Exception e) {
     			System.out.println("null seed");
     		}	

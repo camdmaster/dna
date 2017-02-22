@@ -87,7 +87,7 @@ public class Graph {
 		Collections.sort(list);
 		Collections.reverse(list);
 		
-		List<Vertex> candidates = list.subList(0, 100);
+		List<Vertex> candidates = list.subList(0, 500);
 		Collections.sort(candidates, new FValueComparator());
 		Collections.reverse(candidates);
 		
