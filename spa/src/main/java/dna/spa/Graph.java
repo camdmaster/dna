@@ -83,11 +83,12 @@ public class Graph {
 	}
 	
 	public List<Vertex> getSeedVertex() {
-		List<Vertex> list = new ArrayList<Vertex>(vertexMap.values());
-		Collections.sort(list);
-		Collections.reverse(list);
+//		List<Vertex> list = new ArrayList<Vertex>(vertexMap.values());
+//		Collections.sort(list);
+//		Collections.reverse(list);
 		
-		List<Vertex> candidates = list.subList(0, 500);
+//		List<Vertex> candidates = list.subList(0, 500);
+		List<Vertex> candidates = new ArrayList<Vertex>(vertexMap.values());
 		Collections.sort(candidates, new FValueComparator());
 		Collections.reverse(candidates);
 		

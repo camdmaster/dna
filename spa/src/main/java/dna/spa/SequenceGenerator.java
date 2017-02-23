@@ -9,6 +9,8 @@ import dna.spa.io.FastaWriter;
 public class SequenceGenerator {
 
 	private Graph graph;
+	private List<Vertex> branchV1List;
+	private List<Vertex> branchV2List;
 	
 	public SequenceGenerator(Graph graph) {
 		this.graph = graph;
@@ -31,18 +33,37 @@ public class SequenceGenerator {
 //    		Stack<Vertex> stack = new Stack<Vertex>();
 //    		stack.push(seed);
     		int count = i+1;
-    		System.out.println("seed " + count + ": " + seed.toString());
+    		System.out.print("seed " + count + ": " + seed.toString() + ", ");
     		ArrayList<Vertex> seqV = new ArrayList<Vertex>();
+    		branchV1List = new ArrayList<Vertex>();
+    		branchV2List = new ArrayList<Vertex>();
     		traverseV1(seed, seqV);
     		traverseV2(seed, seqV);
-
-    		StringBuilder sb = new StringBuilder();
-    		String header = "seed_" + seed.getString();
-    		for(Vertex v: seqV) {
-    			sb.append(v.getString());
+    		int branchCount = branchV1List.size() + branchV2List.size();
+    		System.out.println("branch count: " + branchCount);
+    		StringBuilder sb = new StringBuilder(seqV.get(0).getString());
+    		String header = "seed=" + seed.getString() + ";branch=" + branchCount;
+    		
+    		if(seqV.size() + sb.length()-1 < 60) {
+    			graph.removeVisitedGraph();
+    			continue;
+    		}
+    		
+    		for(int j=1; j<seqV.size(); j++) {
+    			Vertex tmpV = seqV.get(j); 
+    			sb.append(tmpV.getString().substring(tmpV.getString().length()-1));
     		}
     		Sequence seq = new Sequence(header, sb.toString());
     		bw.write(seq);
+    		
+    		// branch traverse
+    		for(Vertex v: branchV1List) {
+    			ArrayList<Vertex> branchV = new ArrayList<Vertex>();
+    			traverseV1(v, branchV);
+    			System.out.println("branch V1: " + getSequenceString(branchV));
+    		}
+//    		for(Vertex v: branchV2List) traverseV2(v, branchV);
+    		
 //    		int countTree = 1;
 //    		for(String seq1: seqListPre) {
 //    			for(String seq2: seqListPost) {
@@ -60,6 +81,15 @@ public class SequenceGenerator {
     	bw.close();
     }
 	
+	private String getSequenceString(List<Vertex> vertexList) {
+		StringBuilder sb = new StringBuilder(vertexList.get(0).getString());
+		for(int i=1; i<vertexList.size(); i++) {
+			Vertex tmpV = vertexList.get(i); 
+			sb.append(tmpV.getString().substring(tmpV.getString().length()-1));
+		}
+		return sb.toString();
+	}
+	
 //	private Vertex getSeed() {
 //    	Vertex seed = null;
 //    	Iterator<Vertex> iter = graph.vertexMap.values().iterator();
@@ -73,63 +103,69 @@ public class SequenceGenerator {
 //    	return seed;
 //    }
 	
-	private void traverseV1(Vertex seed, ArrayList<Vertex> sequence) {
-		ArrayList<Edge> edgeList = seed.getEdgeList();
+	private void traverseV1(Vertex vertex, ArrayList<Vertex> sequence) {
+		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
+		Edge extEdge = null;
+		int branchCount = 0;
 		int maxCoverage = 0;
 		double maxFValue = 0;
 		for(Edge edge: edgeList) {
-			if(edge.getV2().equals(seed) && !edge.visited) {
+			if(edge.getV2().equals(vertex) && !edge.visited) {
 				Vertex tmpVertex = edge.getV1();
+				branchCount++;
 				if((tmpVertex.getCoverage() > maxCoverage) ||
 						((tmpVertex.getCoverage() == maxCoverage) && tmpVertex.f_value > maxFValue) ) {
 					maxCoverage = tmpVertex.getCoverage();
 					maxFValue = tmpVertex.f_value;
 					extVertex = tmpVertex;
-					
-					edge.visited = true;
-					extVertex.visited = true;
+					extEdge = edge;
 				} 
 			}
 		}
 		
+		if(branchCount > 1)
+			branchV1List.add(vertex);
+		
 		if(extVertex != null) {
+			extEdge.visited = true;
+			extVertex.visited = true;
 			sequence.add(0, extVertex);
 			traverseV1(extVertex, sequence);
 		} 
-//		else {
-//			System.out.println(string);
-//		}
 		
 	}
 	
-	private void traverseV2(Vertex seed, ArrayList<Vertex> sequence) {
-		ArrayList<Edge> edgeList = seed.getEdgeList();
+	private void traverseV2(Vertex vertex, ArrayList<Vertex> sequence) {
+		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
+		Edge extEdge = null;
+		int branchCount = 0;
 		int maxCoverage = 0;
 		double maxFValue = 0;
 		for(Edge edge: edgeList) {
-			if(edge.getV1().equals(seed) && !edge.visited) {
+			if(edge.getV1().equals(vertex) && !edge.visited) {
 				Vertex tmpVertex = edge.getV2();
+				branchCount++;
 				if((tmpVertex.getCoverage() > maxCoverage) ||
 						((tmpVertex.getCoverage() == maxCoverage) && tmpVertex.f_value > maxFValue) ) {
 					maxCoverage = tmpVertex.getCoverage();
 					maxFValue = tmpVertex.f_value;
 					extVertex = tmpVertex;
-					
-					edge.visited = true;
-					extVertex.visited = true;
+					extEdge = edge;
 				} 
 			}
 		}
 		
+		if(branchCount > 1)
+			branchV2List.add(vertex);
+		
 		if(extVertex != null) {
+			extEdge.visited = true;
+			extVertex.visited = true;
 			sequence.add(extVertex);
-//			string.append(extVertex.getString().substring(extVertex.getString().length()-1));
 			traverseV2(extVertex, sequence);
 		} 
-//		else {
-//			System.out.println(string);
-//		}
+
 	}
 }
