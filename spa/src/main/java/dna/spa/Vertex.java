@@ -2,10 +2,12 @@ package dna.spa;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class Vertex implements Comparable<Vertex> {
 
 	private ArrayList<Edge> edgeList;
+	private List<String> readFragmentIDList;
 	private String string;
 	private int coverage;
 	public double f_value;
@@ -14,6 +16,7 @@ public class Vertex implements Comparable<Vertex> {
 	public Vertex(String string) {
 		this.string = string;
 		edgeList = new ArrayList<Edge>();
+		readFragmentIDList = new ArrayList<String>();
 		this.coverage = 1;
 	}
 	
@@ -35,6 +38,14 @@ public class Vertex implements Comparable<Vertex> {
 
 	public void addEdge(Edge edge) {
 		edgeList.add(edge);
+	}
+
+	public List<String> getReadFragmentIDList() {
+		return readFragmentIDList;
+	}
+	
+	public void addReadFragmentIDList(String readFragID) {
+		readFragmentIDList.add(readFragID);
 	}
 
 	@Override

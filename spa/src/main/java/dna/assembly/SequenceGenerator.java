@@ -1,9 +1,13 @@
-package dna.spa;
+package dna.assembly;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import dna.spa.Edge;
+import dna.spa.Graph;
+import dna.spa.Sequence;
+import dna.spa.Vertex;
 import dna.spa.io.FastaWriter;
 
 public class SequenceGenerator {
@@ -61,6 +65,11 @@ public class SequenceGenerator {
     			ArrayList<Vertex> branchV = new ArrayList<Vertex>();
     			traverseV1(v, branchV);
     			System.out.println("branch V1: " + getSequenceString(branchV));
+    		}
+    		for(Vertex v: branchV2List) {
+    			ArrayList<Vertex> branchV = new ArrayList<Vertex>();
+    			traverseV2(v, branchV);
+    			System.out.println("branch V2: " + getSequenceString(branchV));
     		}
 //    		for(Vertex v: branchV2List) traverseV2(v, branchV);
     		

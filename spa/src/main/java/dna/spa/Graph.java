@@ -108,6 +108,7 @@ public class Graph {
 		return list;
 	}
 	
+	@Deprecated
 	public void traverseV1(Vertex vertex, StringBuilder string, Stack<Vertex> stack, ArrayList<String> seqList) {
 //		ArrayList<String> seqList = new ArrayList<String>();
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
@@ -141,6 +142,7 @@ public class Graph {
 //		return seqList;
 	}
 	
+	@Deprecated
 	public void traverseV2(Vertex vertex, StringBuilder string, Stack<Vertex> stack, ArrayList<String> seqList) {
 //		ArrayList<String> seqList = new ArrayList<String>();
 		ArrayList<Edge> edgeList = vertex.getEdgeList();

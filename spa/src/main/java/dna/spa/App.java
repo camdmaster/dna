@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import dna.assembly.SequenceGenerator;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
 
@@ -36,7 +37,8 @@ public class App
 //    		traverseGraph(graph);
 
     		// SPA based search
-    		Graph graph = makeGraph(readList);
+//    		Graph graph = makeGraph(readList);
+    		Graph graph = GraphGenerator.generate(readList);
     		SequenceGenerator sg = new SequenceGenerator(graph);
     		sg.traverseGraph();
     		
@@ -49,6 +51,7 @@ public class App
     	System.out.println("Done.");
     }
     
+    @Deprecated
     private static Graph makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
     	// make graph
     	Graph graph = new Graph();
