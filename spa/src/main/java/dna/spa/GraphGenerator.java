@@ -2,6 +2,10 @@ package dna.spa;
 
 import java.util.ArrayList;
 
+import dna.graph.Edge;
+import dna.graph.Graph;
+import dna.graph.Vertex;
+
 public class GraphGenerator {
 
 	public GraphGenerator() {

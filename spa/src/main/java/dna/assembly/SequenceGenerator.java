@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dna.spa.Edge;
-import dna.spa.Graph;
+import dna.graph.Edge;
+import dna.graph.Graph;
+import dna.graph.Vertex;
 import dna.spa.Sequence;
-import dna.spa.Vertex;
 import dna.spa.io.FastaWriter;
 
+/**
+ * assembly - SPA like
+ * @author camdmaster
+ *
+ */
 public class SequenceGenerator {
 
 	private Graph graph;
@@ -112,7 +117,7 @@ public class SequenceGenerator {
 //    	return seed;
 //    }
 	
-	private void traverseV1(Vertex vertex, ArrayList<Vertex> sequence) {
+	public void traverseV1(Vertex vertex, ArrayList<Vertex> sequence) {
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
 		Edge extEdge = null;
@@ -145,7 +150,7 @@ public class SequenceGenerator {
 		
 	}
 	
-	private void traverseV2(Vertex vertex, ArrayList<Vertex> sequence) {
+	public void traverseV2(Vertex vertex, ArrayList<Vertex> sequence) {
 		ArrayList<Edge> edgeList = vertex.getEdgeList();
 		Vertex extVertex = null;
 		Edge extEdge = null;

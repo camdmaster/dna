@@ -10,7 +10,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import dna.assembly.Assembly_SimpleGraphMethod;
 import dna.assembly.SequenceGenerator;
+import dna.graph.Edge;
+import dna.graph.Graph;
+import dna.graph.Vertex;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
 
@@ -24,6 +28,12 @@ public class App
 {
     public static void main( String[] args )
     {
+//    	Stack<Integer> stack = new Stack<Integer>();
+//    	stack.push(1);
+//    	stack.push(2);
+//    	stack.push(3);
+//    	System.out.println(stack.get(0));
+    	
     	// read
     	ArrayList<Sequence> readList = null;
     	
@@ -37,11 +47,14 @@ public class App
 //    		traverseGraph(graph);
 
     		// SPA based search
-//    		Graph graph = makeGraph(readList);
-    		Graph graph = GraphGenerator.generate(readList);
-    		SequenceGenerator sg = new SequenceGenerator(graph);
-    		sg.traverseGraph();
+//    		Graph graph = GraphGenerator.generate(readList);
+//    		SequenceGenerator sg = new SequenceGenerator(graph);
+//    		sg.traverseGraph();
     		
+    		// simplified graph method
+    		Graph graph = GraphGenerator.generate(readList);
+    		Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
+    		assembly.makeGraph();
     		
 //    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
@@ -158,10 +171,11 @@ public class App
     
     private static Vertex getSeed(Graph graph) {
     	Vertex seed = null;
-    	Iterator<Vertex> iter = graph.vertexMap.values().iterator();
+    	Iterator<Vertex> iter = graph.getVertexMap().values().iterator();
     	while(seed == null && iter.hasNext()) {
 //    	if(iter.hasNext()) {
-    		try {        		seed = iter.next();	
+    		try {
+    			seed = iter.next();	
     		} catch(Exception e) {
     			System.out.println("null seed");
     		}	
