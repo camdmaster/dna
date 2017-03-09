@@ -27,6 +27,9 @@ public class App
 {
     public static void main( String[] args )
     {
+    	// job start
+    	long startTime = System.nanoTime();
+    	
     	// read
     	ArrayList<Sequence> readList = null;
     	
@@ -62,6 +65,10 @@ public class App
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
+    	
+    	long endTime = System.nanoTime();
+    	long lTime = endTime - startTime;
+    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
     	System.out.println("Done.");
     }
     
