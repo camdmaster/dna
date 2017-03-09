@@ -31,10 +31,10 @@ public class App
     	
     	try {
 //    		seqList = makeTargetSequence();
-//    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
-//    		seqList = reader.read();
-    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Staphylococcus_aureus_04_02981_uid161969/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa");
+    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
     		seqList = reader.read();
+//    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Staphylococcus_aureus_04_02981_uid161969/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa");
+//    		seqList = reader.read();
 //    		seqList.addAll(reader.read());
 //    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
 //    		seqList = reader.read();
@@ -137,7 +137,8 @@ public class App
 //    	List<Vertex> seeds = graph.getSeedVertex();
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\traverse_fgs_noindel.txt"));
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("/data1/yjseo/dfs_Clostridium_difficile_630_uid57679.out"));
-    	FastaWriter bw = new FastaWriter("/home/yjseo/temp/NC_017340_ffn_single.bwa.read1.fasta.fgs.asb.faa");
+//    	FastaWriter bw = new FastaWriter("/home/yjseo/temp/NC_017340_ffn_single.bwa.read1.fasta.fgs.asb.faa");
+    	FastaWriter bw = new FastaWriter("/home/yjseo/temp/NC_018936_ffn_single.bwa.read1.fasta.fgs.asb.faa");
     	
     	for(int i=0; i<10000; i++) {
         	// traverse right
@@ -162,7 +163,7 @@ public class App
     		int countTree = 1;
     		for(String seq1: seqListPre) {
     			for(String seq2: seqListPost) {
-    				String header = "seed " + count + ": " + seed.toString() + " " + countTree;
+    				String header = "seed:"+ seed.getString() + "_" + countTree;
     				String string = seq1 + seq2.substring(seed.getString().length());
     				Sequence seq = new Sequence(header, string);
     				countTree++;
