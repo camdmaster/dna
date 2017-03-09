@@ -11,16 +11,23 @@ import dna.graph.SimplifiedEdge;
 import dna.graph.SimplifiedGraph;
 import dna.graph.SimplifiedVertex;
 import dna.graph.Vertex;
+import dna.spa.Sequence;
 
 public class Assembly_SimpleGraphMethod {
 	private Graph seqGraph;
 	private SimplifiedGraph simplifiedGraph;
+	private List<Sequence> assembledSequences;
 
 	public Assembly_SimpleGraphMethod(Graph sequenceGraph) {
 		this.seqGraph = sequenceGraph;
 		simplifiedGraph = new SimplifiedGraph();
+		assembledSequences = new ArrayList<Sequence>();
 	}
 	
+	public List<Sequence> getAssembledSequences() {
+		return assembledSequences;
+	}
+
 	public void makeGraph() {
 		findSimplifedVertex();
 		findSimplifiedEdge();
@@ -35,8 +42,15 @@ public class Assembly_SimpleGraphMethod {
 		Iterator<Vertex> iter = seqGraph.getVertexMap().values().iterator();
     	while(iter.hasNext()) {
     			Vertex vx = iter.next();
-    			int edgeSize = vx.getEdgeList().size();
-    			if(edgeSize > 2) {
+    			int inEdgeSize = 0;
+    			int outEdgeSize = 0;
+    			for(Edge edge: vx.getEdgeList()) {
+    				if(edge.getV2().equals(vx))
+    					inEdgeSize++;
+    				else
+    					outEdgeSize++;
+    			}
+    			if(inEdgeSize > 1 || outEdgeSize > 1) {
     				vx.visited = true;
     				SimplifiedVertex svx = new SimplifiedVertex(vx);
     				simplifiedGraph.addSVertex(svx);
@@ -61,7 +75,6 @@ public class Assembly_SimpleGraphMethod {
     	List<Vertex> seeds = seqGraph.getSeedVertex();
     	
     	for(int i=0; i<seeds.size(); i++) {
-//    	for(int i=0; i<1000; i++) {
         	// traverse right
     		Vertex seed = seeds.get(i);
     		seed.visited = true;
@@ -69,14 +82,13 @@ public class Assembly_SimpleGraphMethod {
     			continue;
 
     		ArrayList<Vertex> seqV = new ArrayList<Vertex>();
+    		seqV.add(seed);
     		sGenerator.traverseV1(seed, seqV);
     		sGenerator.traverseV2(seed, seqV);
     		SimplifiedEdge sEdge = new SimplifiedEdge(seqV);
     		simplifiedGraph.addSEdge(sEdge);
     		
     		seqGraph.removeVisitedGraph();
-    		
-//    		System.out.println(getSequenceString(seqV));
     	}
     	return;
     }
@@ -101,14 +113,16 @@ public class Assembly_SimpleGraphMethod {
 				sEdge.setV2(simplifiedGraph.getSVertex(lastKey));
 			}
 			if(firstKey == null && lastKey == null) {
-				System.out.println(getSequenceString(seq));
-//				simplifiedGraph.removeSEdge(sEdge);
+				String header = Long.toString(System.currentTimeMillis());
+				String seqString = getSequenceString(seq);
+				Sequence sequence = new Sequence(header, seqString);
+				this.assembledSequences.add(sequence);
 				tempSEdge.add(sEdge);
 			}
 		}
 		
 		for(SimplifiedEdge e: tempSEdge)
-			simplifiedGraph.removeSEdge(e);
+			simplifiedGraph.removeEdge(e);
 		
 		return;
 	}
@@ -117,16 +131,35 @@ public class Assembly_SimpleGraphMethod {
 	 * Proc 4.
 	 */
 	private void dfs() {
-		for(SimplifiedEdge seed: simplifiedGraph.getEdgeList()) {
+		List<SimplifiedEdge> seeds = simplifiedGraph.getEdgeList();
+		for(int i=0; i<seeds.size(); i++) {
+			SimplifiedEdge seed = seeds.get(i);
+			if(seed == null)
+				continue;
+			
 			Stack<SimplifiedEdge> stack = new Stack<SimplifiedEdge>();
 			stack.push(seed);
-//			ArrayList<String> seqListPre = new ArrayList<String>();
-			traverseV1(seed, stack);
+			List<String> seqStringListV1 = new ArrayList<String>();
+			traverseV1(seed, stack, seqStringListV1);
+			stack = new Stack<SimplifiedEdge>();
+			stack.push(seed);
+			List<String> seqStringListV2 = new ArrayList<String>();
+			traverseV2(seed, stack, seqStringListV2);
 			
+			for(String str1: seqStringListV1) {
+				for(String str2: seqStringListV1) {
+					String header = Long.toString(System.currentTimeMillis());
+					String seqString = str1 + str2;
+					Sequence seq = new Sequence(header, seqString);
+					this.assembledSequences.add(seq);
+				}
+			}
+			
+			simplifiedGraph.removeVisited();
 		}
 	}
 	
-	private void traverseV1(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack) {
+	private void traverseV1(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack, List<String> seqStringList) {
 		SimplifiedVertex vertex = seedEdge.getV1();
 		seedEdge.visited = true;
 		List<SimplifiedEdge> edgeList = new ArrayList<SimplifiedEdge>();
@@ -135,11 +168,13 @@ public class Assembly_SimpleGraphMethod {
 			edgeList = vertex.getEdgeList();
 		}
 		for(SimplifiedEdge edge: edgeList) {
-			if(!seedEdge.equals(edge)) {
-				if(stack.contains(edge))
-					continue;
-				stack.push(edge);
-				traverseV1(edge, stack);
+			if(!(edge.equals(seedEdge) || stack.contains(edge))) {
+				SimplifiedVertex edgeV2 = edge.getV2();
+				SimplifiedVertex seedV1 = seedEdge.getV1();
+				if(seedV1 != null && edgeV2 != null && edgeV2 == seedV1) {
+					stack.push(edge);
+					traverseV1(edge, stack, seqStringList);
+				}
 			}
 		}
 		
@@ -156,36 +191,50 @@ public class Assembly_SimpleGraphMethod {
 					sb.append(svx.getString().substring(svx.getString().length()-1));
 				}
 			}
-			System.out.println("V1: " + sb.toString());
+			seqStringList.add(sb.toString());
 		}
 		
 		stack.pop();
 	}
 	
-	private void traverseV2(Vertex vertex, StringBuilder string, Stack<Vertex> stack, ArrayList<String> seqList) {
-		ArrayList<Edge> edgeList = vertex.getEdgeList();
-		Vertex tmpVertex = null;
-		for(Edge edge: edgeList) {
-			if(edge.getV1().equals(vertex)) {
-				tmpVertex = edge.getV2();
-				if(stack.contains(tmpVertex))
-					continue;
-				edge.visited = true;
-				tmpVertex.visited = true;
-				string.append(tmpVertex.getString().substring(tmpVertex.getString().length()-1));
-				stack.push(tmpVertex);
-				traverseV2(tmpVertex, string, stack, seqList);
+	private void traverseV2(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack, List<String> seqStringList) {
+		SimplifiedVertex vertex = seedEdge.getV2();
+		seedEdge.visited = true;
+		List<SimplifiedEdge> edgeList = new ArrayList<SimplifiedEdge>();
+		if(vertex != null) {
+			vertex.visited = true;
+			edgeList = vertex.getEdgeList();
+		}
+		for(SimplifiedEdge edge: edgeList) {
+			if(!(edge.equals(seedEdge) || stack.contains(edge))) {
+				SimplifiedVertex edgeV1 = edge.getV1();
+				SimplifiedVertex seedV2 = seedEdge.getV2();
+				if(seedV2 != null && edgeV1 != null && edgeV1 == seedV2) {
+					stack.push(edge);
+					traverseV2(edge, stack, seqStringList);
+				}
 			}
 		}
 		
-		if(tmpVertex == null) {
-			StringBuilder sb = new StringBuilder(stack.get(0).getString());
-			for(int i=1; i<stack.size(); i++) {
-				Vertex v = stack.get(i);
-				sb.append(v.getString().substring(v.getString().length()-1));
+		if(vertex == null) {
+			StringBuilder sb = new StringBuilder();
+			SimplifiedVertex first = stack.get(0).getV2();
+			if(first != null) {
+				Vertex firstVx = stack.get(0).getV2().getVertex(); 
+				sb.append(firstVx.getString().substring(firstVx.getString().length()-1));
+				for(int i=1; i<stack.size(); i++) {
+					SimplifiedEdge e = stack.get(i);
+					for(Vertex v: e.getSequence())
+						sb.append(v.getString().substring(v.getString().length()-1));
+					if(i!=stack.size()-1) {
+						Vertex svx = e.getV2().getVertex();
+						sb.append(svx.getString().substring(svx.getString().length()-1));
+					}
+				}
+				seqStringList.add(sb.toString());
 			}
-			seqList.add(sb.toString());
 		}
+		
 		stack.pop();
 	}
 	
@@ -197,5 +246,4 @@ public class Assembly_SimpleGraphMethod {
 		}
 		return sb.toString();
 	}
-
 }

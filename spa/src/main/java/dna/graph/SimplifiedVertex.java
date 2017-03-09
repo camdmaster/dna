@@ -25,4 +25,8 @@ public class SimplifiedVertex {
 	public void addSEdge(SimplifiedEdge edge) {
 		edgeList.add(edge);
 	}
+
+	public boolean removeEdge(SimplifiedEdge edge) {
+		return edgeList.remove(edge);
+	}
 }

@@ -37,8 +37,38 @@ public class SimplifiedGraph {
 		return edgeList;
 	}
 	
-	public void removeSEdge(SimplifiedEdge edge) {
-		edgeList.remove(edge);
+	public void removeVisited() {
+		for(int i=edgeList.size()-1; i>=0; i--) {
+			SimplifiedEdge edge = edgeList.get(i);
+			if(edge.visited)
+				removeEdge(edge);
+		}
+		
+		List<SimplifiedVertex> vlist = new ArrayList<SimplifiedVertex>(vertexMap.values());
+		for(SimplifiedVertex v: vlist) {
+			if(v.getEdgeList().size() == 0)
+				removeVertex(v);
+		}
 	}
+	
+	public void removeEdge(SimplifiedEdge edge) {
+		edgeList.remove(edge);
+		if(edge.getV1() != null)
+			edge.getV1().removeEdge(edge);
+		if(edge.getV2() != null)
+			edge.getV2().removeEdge(edge);
+	}
+	
+	public void removeVertex(SimplifiedVertex vertex) {
+		vertexMap.remove(vertex.getVertex());
+		for(int i=vertex.getEdgeList().size()-1; i>=0; i--) {
+			SimplifiedEdge e = vertex.getEdgeList().get(i);
+			removeEdge(e);
+		}
+	}
+	
+//	public void removeSEdge(SimplifiedEdge edge) {
+//		edgeList.remove(edge);
+//	}
 	
 }

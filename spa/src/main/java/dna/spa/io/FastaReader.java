@@ -17,14 +17,14 @@ public class FastaReader {
 	}
 	
 	public ArrayList<Sequence> read() throws IOException {
-//		String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\data\\20161216_protein_3_read.faa";
     	File file = new File(fileName);
     	BufferedReader br = new BufferedReader(new FileReader(file));
     	ArrayList<Sequence> sequenceList = new ArrayList<Sequence>();
     	int count = 0;
     	// get read
     	String line = br.readLine();
-    	while(line != null && count != 150000) {
+//    	while(line != null && count != 150000) {
+    	while(line != null) {
     		String header = line.substring(1);
     		StringBuilder seq = new StringBuilder();
     		line = br.readLine();
@@ -32,9 +32,7 @@ public class FastaReader {
     			seq.append(line);
     			line = br.readLine();	
     		}
-//    		System.out.println(header);
     		count++;
-//    		System.out.println(count);
     		Sequence sequence = new Sequence(header, seq.toString());    		
     		sequenceList.add(sequence);
     	}

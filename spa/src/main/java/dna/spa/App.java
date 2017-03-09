@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Stack;
 
 import dna.assembly.Assembly_SimpleGraphMethod;
-import dna.assembly.SequenceGenerator;
 import dna.graph.Edge;
 import dna.graph.Graph;
 import dna.graph.Vertex;
@@ -28,18 +27,13 @@ public class App
 {
     public static void main( String[] args )
     {
-//    	Stack<Integer> stack = new Stack<Integer>();
-//    	stack.push(1);
-//    	stack.push(2);
-//    	stack.push(3);
-//    	System.out.println(stack.get(0));
-    	
     	// read
     	ArrayList<Sequence> readList = null;
     	
     	try {
 //    		seqList = makeTargetSequence();
     		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\20170202\\NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
+//    		FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\data\\NC_018936.faa");
     		readList = reader.read();
     		
     		// depth first search
@@ -55,6 +49,13 @@ public class App
     		Graph graph = GraphGenerator.generate(readList);
     		Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
     		assembly.makeGraph();
+    		List<Sequence> seqList = assembly.getAssembledSequences();
+    		FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\simplegraph_test.faa");
+    		for(Sequence seq: seqList) {
+    			bw.write(seq);	
+    		}
+    		bw.close();
+    		
     		
 //    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {

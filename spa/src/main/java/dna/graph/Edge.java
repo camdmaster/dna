@@ -1,4 +1,5 @@
-package dna.spa;
+package dna.graph;
+
 
 public class Edge {
 
