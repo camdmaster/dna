@@ -4,6 +4,7 @@ public class Sequence {
 	
 	private String header;
 	private String string;
+	private int type;
 	
 	public Sequence(String header, String string) {
 		this.header = header;

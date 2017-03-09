@@ -10,6 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import dna.assembly.Assembly_SimpleGraphMethod;
+import dna.graph.Edge;
+import dna.graph.Graph;
+import dna.graph.Vertex;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
 
@@ -27,25 +31,41 @@ public class App
     	long startTime = System.nanoTime();
     	
     	// target sequence
-    	ArrayList<Sequence> seqList = null;
+    	ArrayList<Sequence> readList = null;
+
     	
     	try {
 //    		seqList = makeTargetSequence();
     		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
-    		seqList = reader.read();
+    		readList = reader.read();
 //    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Staphylococcus_aureus_04_02981_uid161969/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa");
 //    		seqList = reader.read();
 //    		seqList.addAll(reader.read());
 //    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
 //    		seqList = reader.read();
 //    		seqList.addAll(reader.read());
-
     		
-//			IterativeSequenceChecker ic = new IterativeSequenceChecker(seqList);
-//			ic.findPattern();
-			
-    		Graph graph = makeGraph(seqList);
-    		traverseGraph(graph);
+    		// depth first search
+//    		Graph graph = makeGraph(readList);
+//    		traverseGraph(graph);
+
+    		// SPA based search
+//    		Graph graph = GraphGenerator.generate(readList);
+//    		SequenceGenerator sg = new SequenceGenerator(graph);
+//    		sg.traverseGraph();
+    		
+    		// simplified graph method
+    		Graph graph = GraphGenerator.generate(readList);
+    		Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
+    		assembly.makeGraph();
+    		List<Sequence> seqList = assembly.getAssembledSequences();
+    		FastaWriter bw = new FastaWriter("/data1/yjseo/20170308/NC_018936_ffn_single.bwa.read1.fgs.asb.faa");
+    		for(Sequence seq: seqList) {
+    			bw.write(seq);	
+    		}
+    		bw.close();
+    		
+    		
 //    		printVertexOrderedByCoverage(graph);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
@@ -59,6 +79,7 @@ public class App
     	System.out.println("Done.");
     }
     
+    @Deprecated
     private static Graph makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
     	// make graph
     	Graph graph = new Graph();
@@ -180,11 +201,11 @@ public class App
     
     private static Vertex getSeed(Graph graph) {
     	Vertex seed = null;
-    	Iterator<Vertex> iter = graph.vertexMap.values().iterator();
+    	Iterator<Vertex> iter = graph.getVertexMap().values().iterator();
     	while(seed == null && iter.hasNext()) {
 //    	if(iter.hasNext()) {
     		try {
-        		seed = iter.next();	
+    			seed = iter.next();	
     		} catch(Exception e) {
     			System.out.println("null seed");
     		}	
