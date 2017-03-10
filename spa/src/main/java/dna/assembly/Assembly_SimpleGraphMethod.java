@@ -17,11 +17,13 @@ public class Assembly_SimpleGraphMethod {
 	private Graph seqGraph;
 	private SimplifiedGraph simplifiedGraph;
 	private List<Sequence> assembledSequences;
+	private int assembledNum;
 
 	public Assembly_SimpleGraphMethod(Graph sequenceGraph) {
 		this.seqGraph = sequenceGraph;
 		simplifiedGraph = new SimplifiedGraph();
 		assembledSequences = new ArrayList<Sequence>();
+		assembledNum = 0;
 	}
 	
 	public List<Sequence> getAssembledSequences() {
@@ -112,7 +114,7 @@ public class Assembly_SimpleGraphMethod {
     		simplifiedGraph.addSEdge(sEdge);
     		
 //    		seqGraph.removeVisitedGraph();
-    		long et = System.nanoTime();
+//    		long et = System.nanoTime();
 //    		count++;
 //    		System.out.println(count + " TIME : " + (et - st) /1000000.0 + " (ms)");
     	}
@@ -140,7 +142,8 @@ public class Assembly_SimpleGraphMethod {
 			}
 			// make sequence if size > 60
 			if(firstKey == null && lastKey == null && seq.size() >= 60) {
-				String header = Long.toString(System.currentTimeMillis());
+				assembledNum++;
+				String header = "sequence_nobrach_" + assembledNum;
 				String seqString = getSequenceString(seq);
 				Sequence sequence = new Sequence(header, seqString);
 				this.assembledSequences.add(sequence);
@@ -174,8 +177,9 @@ public class Assembly_SimpleGraphMethod {
 			traverseV2(seed, stack, seqStringListV2);
 			
 			for(String str1: seqStringListV1) {
-				for(String str2: seqStringListV1) {
-					String header = Long.toString(System.currentTimeMillis());
+				for(String str2: seqStringListV2) {
+					assembledNum++;
+					String header = "sequence_branch_" + assembledNum;
 					String seqString = str1 + str2;
 					Sequence seq = new Sequence(header, seqString);
 					this.assembledSequences.add(seq);
@@ -209,8 +213,10 @@ public class Assembly_SimpleGraphMethod {
 			StringBuilder sb = new StringBuilder();
 			Vertex firstVx = stack.peek().getSequence().get(0); 
 			sb.append(firstVx.getString().substring(0, firstVx.getString().length()-1));
+			String test = "";
 			for(int i=stack.size()-1; i>=0; i--) {
 				SimplifiedEdge e = stack.get(i);
+				test += e.toString() + " + ";
 				for(Vertex v: e.getSequence())
 					sb.append(v.getString().substring(v.getString().length()-1));
 				if(i!=0) {
@@ -218,6 +224,8 @@ public class Assembly_SimpleGraphMethod {
 					sb.append(svx.getString().substring(svx.getString().length()-1));
 				}
 			}
+//			if(stack.size() > 1)
+//				System.out.println("V1: " + sb.toString());
 			seqStringList.add(sb.toString());
 		}
 		
@@ -249,8 +257,10 @@ public class Assembly_SimpleGraphMethod {
 			if(first != null) {
 				Vertex firstVx = stack.get(0).getV2().getVertex(); 
 				sb.append(firstVx.getString().substring(firstVx.getString().length()-1));
+				String test = stack.get(0).toString() + " + ";
 				for(int i=1; i<stack.size(); i++) {
 					SimplifiedEdge e = stack.get(i);
+					test += e.toString() + " + ";
 					for(Vertex v: e.getSequence())
 						sb.append(v.getString().substring(v.getString().length()-1));
 					if(i!=stack.size()-1) {
@@ -258,6 +268,8 @@ public class Assembly_SimpleGraphMethod {
 						sb.append(svx.getString().substring(svx.getString().length()-1));
 					}
 				}
+//				if(stack.size() > 1)
+//					System.out.println("V2: " + sb.toString());
 				seqStringList.add(sb.toString());
 			}
 		}
