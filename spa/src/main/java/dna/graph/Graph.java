@@ -225,9 +225,13 @@ public class Graph {
 	
 	public void removeVertex(Vertex vertex) {
 		vertexMap.remove(vertex.getString());
-		for(int i=vertex.getEdgeList().size()-1; i>=0; i--) {
-			Edge e = vertex.getEdgeList().get(i);
+		while(vertex.getEdgeList().size() != 0) {
+			Edge e = vertex.getEdgeList().get(0);
 			removeEdge(e);
 		}
+//		for(int i=vertex.getEdgeList().size()-1; i>=0; i--) {
+//			Edge e = vertex.getEdgeList().get(i);
+//			removeEdge(e);
+//		}
 	}
 }

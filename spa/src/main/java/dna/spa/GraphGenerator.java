@@ -26,14 +26,14 @@ public class GraphGenerator {
     		
     		String v = string.substring(0, vertexLength);
     		Vertex vertex = null;
-    		String fragID = parseReadHeader(seq.getHeader());
+//    		String fragID = parseReadHeader(seq.getHeader());
         	if(graph.existVertex(v)) {
     			vertex = graph.getVertex(v);
     			vertex.addCoverage();
-    			vertex.addReadFragmentIDList(fragID);
+//    			vertex.addReadFragmentIDList(fragID);
     		} else {
     			vertex = new Vertex(v);
-    			vertex.addReadFragmentIDList(fragID);
+//    			vertex.addReadFragmentIDList(fragID);
     			graph.addVertex(vertex);
     		}
         	
@@ -48,10 +48,10 @@ public class GraphGenerator {
     			if(graph.existVertex(v2)) {
     				vertex2 = graph.getVertex(v2);
     				vertex2.addCoverage();
-    				vertex2.addReadFragmentIDList(fragID);
+//    				vertex2.addReadFragmentIDList(fragID);
     			} else {
     				vertex2 = new Vertex(v2);
-    				vertex2.addReadFragmentIDList(fragID);
+//    				vertex2.addReadFragmentIDList(fragID);
     				graph.addVertex(vertex2);
     			}
     			

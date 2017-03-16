@@ -84,6 +84,8 @@ public class Assembly_SimpleGraphMethod {
     	
     	for(SimplifiedVertex svx: simplifiedGraph.getSVertexList())
     		seqGraph.removeVertex(svx.getVertex());
+    	
+    	System.out.println("Number of Simplified Vertices: " + simplifiedGraph.getSVertexList().size());
 	}
 	
 	/**
@@ -118,7 +120,8 @@ public class Assembly_SimpleGraphMethod {
 //    		count++;
 //    		System.out.println(count + " TIME : " + (et - st) /1000000.0 + " (ms)");
     	}
-    	return;
+    	
+    	System.out.println("Number of Simplified Edges: " + simplifiedGraph.getSEdgeList().size());
     }
 	
 	/**
@@ -126,7 +129,7 @@ public class Assembly_SimpleGraphMethod {
 	 */
 	private void organizeGraph() {
 		List<SimplifiedEdge> tempSEdge = new ArrayList<SimplifiedEdge>();
-		for(SimplifiedEdge sEdge: simplifiedGraph.getEdgeList()) {
+		for(SimplifiedEdge sEdge: simplifiedGraph.getSEdgeList()) {
 			List<Vertex> seq = sEdge.getSequence();
 			Vertex first = seq.get(0);
 			Vertex last = seq.get(seq.size()-1);
@@ -161,7 +164,7 @@ public class Assembly_SimpleGraphMethod {
 	 * Proc 4.
 	 */
 	private void dfs() {
-		List<SimplifiedEdge> seeds = simplifiedGraph.getEdgeList();
+		List<SimplifiedEdge> seeds = simplifiedGraph.getSEdgeList();
 		for(int i=0; i<seeds.size(); i++) {
 			SimplifiedEdge seed = seeds.get(i);
 			if(seed == null)

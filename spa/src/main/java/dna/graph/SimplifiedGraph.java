@@ -33,7 +33,7 @@ public class SimplifiedGraph {
 		edgeList.add(edge);
 	}
 
-	public List<SimplifiedEdge> getEdgeList() {
+	public List<SimplifiedEdge> getSEdgeList() {
 		return edgeList;
 	}
 	
