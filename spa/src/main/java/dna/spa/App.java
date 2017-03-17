@@ -89,7 +89,7 @@ public class App
      */
     private static void Analyze() throws IOException {
     	// assembled sequence
-    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_018140_ffn_single.bwa.read1.fgs.asb.faa";
+    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_014034_ffn_single.bwa.read1.fgs.asb.faa";
     	FastaReader afr = new FastaReader(afileName);
     	List<Sequence> assembleList = afr.read();
     	HashMap<String, Sequence> assembleMap = new HashMap<String, Sequence>();
@@ -97,7 +97,7 @@ public class App
     		assembleMap.put(seq.getHeader(), seq);
     	
     	// reference sequence
-    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_018140.faa";
+    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_014034.faa";
     	FastaReader rfr = new FastaReader(rfileName);
     	List<Sequence> referenceList = rfr.read();
     	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
@@ -105,7 +105,7 @@ public class App
     		referenceMap.put(seq.getHeader(), seq);
     	
     	// blast result
-    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_018140_blastp.out";
+    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_014034_blastp.out";
     	BlastReader br = new BlastReader(fileName);
     	List<BlastResult> bList = br.readTable();
     	

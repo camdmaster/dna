@@ -2,6 +2,7 @@ package dna.analysis;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import dna.spa.Sequence;
@@ -13,6 +14,8 @@ public class Analysis {
 	private List<BlastResult> blastList;
 	private double minCoverage = 0.9;
 	private double minIdentity = 90.0;
+	private double specificity;
+	private double sensitivity;
 
 	public Analysis() {
 		
@@ -25,45 +28,55 @@ public class Analysis {
 	}
 	
 	public void analyze() {
-		double specificity = calculateSpecificity();
-		double sensitivity = calculateSensitivity();
+		calculateSpecificityAndSensitivity();
 		System.out.println("Specificity = " + specificity);
 		System.out.println("Sensitivity = " + sensitivity);
 	}
 	
-	private double calculateSpecificity() {
+	private void calculateSpecificityAndSensitivity() {
 		HashSet<String> matchedAssemble = new HashSet<String>();
-		for(BlastResult br: blastList) {
-			String id = br.getQueryID();
-			double identity = br.getIdentity();
-//			int matchedSize = br.getEndQuery() - br.getStartQuery() - 1;
-			int matchedSize = br.getLengthOfAlignment();
-			int assembleSeqSize = assembleList.get(id).getString().length();
-			double coverage = (double)matchedSize / (double)assembleSeqSize;
-			
-			if(!matchedAssemble.contains(id) && coverage > minCoverage && identity > minIdentity)
-				matchedAssemble.add(id);
-		}
-		
-		System.out.println("Assembly - Matched Sequence: " + matchedAssemble.size() + " Whole Sequence: " + assembleList.size());
-		return (double)matchedAssemble.size() / (double)assembleList.size();
-	}
-	
-	private double calculateSensitivity() {
 		HashSet<String> matchedReference = new HashSet<String>();
+		
 		for(BlastResult br: blastList) {
-			String id = br.getReferenceID();
+			String asbID = br.getQueryID();
+			String refID = br.getReferenceID();
 			double identity = br.getIdentity();
-//			int matchedSize = br.getEndReference() - br.getStartReference() - 1;
 			int matchedSize = br.getLengthOfAlignment();
-			int refSeqSize = referenceList.get(id).getString().length();
+			int refSeqSize = referenceList.get(refID).getString().length();
 			double coverage = (double)matchedSize / (double)refSeqSize;
 			
-			if(!matchedReference.contains(id) && coverage > minCoverage && identity > minIdentity)
-				matchedReference.add(id);
+			if(coverage >= minCoverage && identity >= minIdentity) {
+				if(!matchedAssemble.contains(asbID))
+					matchedAssemble.add(asbID);
+				if(!matchedReference.contains(refID))
+					matchedReference.add(refID);
+			}
+//			else if (assembleList.get(asbID).getString().length() > refSeqSize && identity >= minIdentity) {
+//				System.out.println("Coverage: " + coverage + ", Identity: " + identity);
+//				System.out.println("Asb: " + assembleList.get(asbID).getString());
+//				System.out.println("Ref: " + referenceList.get(refID).getString());
+//			}
+//			if(coverage < minCoverage && identity >= minIdentity) {
+//				System.out.println("Coverage: " + coverage + ", Identity: " + identity);
+//				System.out.println("Asb: " + assembleList.get(asbID).getString());
+//				System.out.println("Ref: " + referenceList.get(refID).getString());
+//			}
 		}
 		
+		int count = 0;
+		Iterator<String> iter = referenceList.keySet().iterator();
+		while(iter.hasNext()) {
+			String key = iter.next();
+			if(!matchedReference.contains(key)) {
+				count++;
+				System.out.println(count + " Ref: " + referenceList.get(key).getHeader());
+			}
+		}
+		
+		specificity = (double)matchedAssemble.size() / (double)assembleList.size();
+		sensitivity = (double)matchedReference.size() / (double)referenceList.size();
+		System.out.println("Assembly - Matched Sequence: " + matchedAssemble.size() + " Whole Sequence: " + assembleList.size());
 		System.out.println("Reference - Matched Sequence: " + matchedReference.size() + " Whole Sequence: " + referenceList.size());
-		return (double)matchedReference.size() / (double)referenceList.size();
 	}
+	
 }
