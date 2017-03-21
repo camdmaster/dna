@@ -7,7 +7,8 @@ public class SimplifiedVertex {
 
 	private Vertex vertex;
 	private List<SimplifiedEdge> edgeList;
-	public boolean visited;
+	public boolean visited_seed;
+	public boolean visited_traversal;
 	
 	public SimplifiedVertex(Vertex vertex) {
 		this.vertex = vertex;

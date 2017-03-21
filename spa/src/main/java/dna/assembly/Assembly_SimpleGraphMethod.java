@@ -167,7 +167,7 @@ public class Assembly_SimpleGraphMethod {
 		List<SimplifiedEdge> seeds = simplifiedGraph.getSEdgeList();
 		for(int i=0; i<seeds.size(); i++) {
 			SimplifiedEdge seed = seeds.get(i);
-			if(seed == null)
+			if(seed.visited_seed)
 				continue;
 			
 			Stack<SimplifiedEdge> stack = new Stack<SimplifiedEdge>();
@@ -189,16 +189,18 @@ public class Assembly_SimpleGraphMethod {
 				}
 			}
 			
-			simplifiedGraph.removeVisited();
+			simplifiedGraph.resetVisited_Traversal(false);
 		}
 	}
 	
 	private void traverseV1(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack, List<String> seqStringList) {
 		SimplifiedVertex vertex = seedEdge.getV1();
-		seedEdge.visited = true;
+		seedEdge.visited_traversal = true;
+		seedEdge.visited_seed = true;
 		List<SimplifiedEdge> edgeList = new ArrayList<SimplifiedEdge>();
-		if(vertex != null) {
-			vertex.visited = true;
+		if(vertex != null && !vertex.visited_traversal) {
+			vertex.visited_traversal = true;
+			vertex.visited_seed = true;
 			edgeList = vertex.getEdgeList();
 		}
 		for(SimplifiedEdge edge: edgeList) {
@@ -212,35 +214,33 @@ public class Assembly_SimpleGraphMethod {
 			}
 		}
 		
-		if(vertex == null) {
-			StringBuilder sb = new StringBuilder();
-			Vertex firstVx = stack.peek().getSequence().get(0); 
-			sb.append(firstVx.getString().substring(0, firstVx.getString().length()-1));
-			String test = "";
-			for(int i=stack.size()-1; i>=0; i--) {
-				SimplifiedEdge e = stack.get(i);
-				test += e.toString() + " + ";
-				for(Vertex v: e.getSequence())
-					sb.append(v.getString().substring(v.getString().length()-1));
-				if(i!=0) {
-					Vertex svx = e.getV2().getVertex();
-					sb.append(svx.getString().substring(svx.getString().length()-1));
-				}
+		StringBuilder sb = new StringBuilder();
+		Vertex firstVx = stack.peek().getSequence().get(0); 
+		sb.append(firstVx.getString().substring(0, firstVx.getString().length()-1));
+		String test = "";
+		for(int i=stack.size()-1; i>=0; i--) {
+			SimplifiedEdge e = stack.get(i);
+			test += e.toString() + " + ";
+			for(Vertex v: e.getSequence())
+				sb.append(v.getString().substring(v.getString().length()-1));
+			if(i!=0) {
+				Vertex svx = e.getV2().getVertex();
+				sb.append(svx.getString().substring(svx.getString().length()-1));
 			}
-//			if(stack.size() > 1)
-//				System.out.println("V1: " + sb.toString());
-			seqStringList.add(sb.toString());
 		}
+		seqStringList.add(sb.toString());
 		
 		stack.pop();
 	}
 	
 	private void traverseV2(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack, List<String> seqStringList) {
 		SimplifiedVertex vertex = seedEdge.getV2();
-		seedEdge.visited = true;
+		seedEdge.visited_traversal = true;
+		seedEdge.visited_seed = true;
 		List<SimplifiedEdge> edgeList = new ArrayList<SimplifiedEdge>();
-		if(vertex != null) {
-			vertex.visited = true;
+		if(vertex != null && !vertex.visited_traversal) {
+			vertex.visited_traversal = true;
+			vertex.visited_seed = true;
 			edgeList = vertex.getEdgeList();
 		}
 		for(SimplifiedEdge edge: edgeList) {
@@ -254,27 +254,23 @@ public class Assembly_SimpleGraphMethod {
 			}
 		}
 		
-		if(vertex == null) {
-			StringBuilder sb = new StringBuilder();
-			SimplifiedVertex first = stack.get(0).getV2();
-			if(first != null) {
-				Vertex firstVx = stack.get(0).getV2().getVertex(); 
-				sb.append(firstVx.getString().substring(firstVx.getString().length()-1));
-				String test = stack.get(0).toString() + " + ";
-				for(int i=1; i<stack.size(); i++) {
-					SimplifiedEdge e = stack.get(i);
-					test += e.toString() + " + ";
-					for(Vertex v: e.getSequence())
-						sb.append(v.getString().substring(v.getString().length()-1));
-					if(i!=stack.size()-1) {
-						Vertex svx = e.getV2().getVertex();
-						sb.append(svx.getString().substring(svx.getString().length()-1));
-					}
+		StringBuilder sb = new StringBuilder();
+		SimplifiedVertex first = stack.get(0).getV2();
+		if(first != null) {
+			Vertex firstVx = stack.get(0).getV2().getVertex(); 
+			sb.append(firstVx.getString().substring(firstVx.getString().length()-1));
+			String test = stack.get(0).toString() + " + ";
+			for(int i=1; i<stack.size(); i++) {
+				SimplifiedEdge e = stack.get(i);
+				test += e.toString() + " + ";
+				for(Vertex v: e.getSequence())
+					sb.append(v.getString().substring(v.getString().length()-1));
+				if(i!=stack.size()-1) {
+					Vertex svx = e.getV2().getVertex();
+					sb.append(svx.getString().substring(svx.getString().length()-1));
 				}
-//				if(stack.size() > 1)
-//					System.out.println("V2: " + sb.toString());
-				seqStringList.add(sb.toString());
 			}
+			seqStringList.add(sb.toString());
 		}
 		
 		stack.pop();

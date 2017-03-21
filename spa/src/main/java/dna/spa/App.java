@@ -43,13 +43,13 @@ public class App
     	// job start
     	long startTime = System.nanoTime();
     	
-//    	assembleRead();
+    	assembleRead();
     	
-    	try {
-			Analyze();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//    	try {
+//			Analyze();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
     	long endTime = System.nanoTime();
     	long lTime = endTime - startTime;
@@ -62,7 +62,7 @@ public class App
      */
     private static void assembleRead() {
     	ArrayList<Sequence> readList = null;
-    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\20170308\\repeat.faa");
+    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_015214_ffn_single.bwa.read1.fgs.faa");
 		try {
 			readList = reader.read();
 			
@@ -71,7 +71,7 @@ public class App
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();
-			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\simplegraph_test.faa");
+			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\test.faa");
 			for(Sequence seq: seqList) {
 				bw.write(seq);
 			}
