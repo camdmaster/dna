@@ -13,6 +13,8 @@ public class GraphGenerator {
 	}
 	
 	public static Graph generate(ArrayList<Sequence> sequenceList) {
+		long startTime = System.nanoTime();
+		System.out.println("<Graph Generation>");
     	// make graph
     	Graph graph = new Graph();
     	int vertexLength = 12;
@@ -65,6 +67,9 @@ public class GraphGenerator {
     		}
     	}
     	graph.setFValue();
+    	
+    	long endTime = System.nanoTime();
+    	System.out.println("Graph TIME : " + (endTime - startTime) /1000000.0 + " (ms)");
     	
     	return graph;
     }

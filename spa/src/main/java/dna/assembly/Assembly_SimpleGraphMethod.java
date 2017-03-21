@@ -29,10 +29,28 @@ public class Assembly_SimpleGraphMethod {
 	}
 
 	public void makeGraph() {
+		long startTime = System.nanoTime();
+		System.out.println("<Simplified Graph Method>");
+		
+		System.out.println("Proc 1: Find simplified vertice");
 		findSimplifedVertex();
+		long p1Time = System.nanoTime();
+		System.out.println("P1 TIME : " + (p1Time - startTime) /1000000.0 + " (ms)");
+		
+		System.out.println("Proc 2: Find simplified edges");
 		findSimplifiedEdge();
+		long p2Time = System.nanoTime();
+		System.out.println("P2 TIME : " + (p2Time - p1Time) /1000000.0 + " (ms)");
+		
+		System.out.println("Proc 3: Organize Simplified Graph");
 		organizeGraph();
+		long p3Time = System.nanoTime();
+		System.out.println("P3 TIME : " + (p3Time - p2Time) /1000000.0 + " (ms)");
+		
+		System.out.println("Proc 4: Assemble sequence by DFS");
 		dfs();
+		long p4Time = System.nanoTime();
+		System.out.println("P4 TIME : " + (p4Time - p3Time) /1000000.0 + " (ms)");
 	}
 	
 	/**
@@ -73,13 +91,18 @@ public class Assembly_SimpleGraphMethod {
 		
 		SequenceGenerator sGenerator = new SequenceGenerator(seqGraph);
     	List<Vertex> seeds = seqGraph.getSeedVertex();
-    	
+//    	int count=0;
     	for(int i=0; i<seeds.size(); i++) {
+//    		long st = System.nanoTime();
         	// traverse right
     		Vertex seed = seeds.get(i);
-    		seed.visited = true;
-    		if(seqGraph.getVertex(seed.getString()) == null)
+    		
+    		if(seed.visited)
     			continue;
+//    		if(seqGraph.getVertex(seed.getString()) == null)
+//    			continue;
+    		
+    		seed.visited = true;
 
     		ArrayList<Vertex> seqV = new ArrayList<Vertex>();
     		seqV.add(seed);
@@ -88,7 +111,10 @@ public class Assembly_SimpleGraphMethod {
     		SimplifiedEdge sEdge = new SimplifiedEdge(seqV);
     		simplifiedGraph.addSEdge(sEdge);
     		
-    		seqGraph.removeVisitedGraph();
+//    		seqGraph.removeVisitedGraph();
+    		long et = System.nanoTime();
+//    		count++;
+//    		System.out.println(count + " TIME : " + (et - st) /1000000.0 + " (ms)");
     	}
     	return;
     }
@@ -112,7 +138,8 @@ public class Assembly_SimpleGraphMethod {
 				simplifiedGraph.getSVertex(lastKey).addSEdge(sEdge);
 				sEdge.setV2(simplifiedGraph.getSVertex(lastKey));
 			}
-			if(firstKey == null && lastKey == null) {
+			// make sequence if size > 60
+			if(firstKey == null && lastKey == null && seq.size() >= 60) {
 				String header = Long.toString(System.currentTimeMillis());
 				String seqString = getSequenceString(seq);
 				Sequence sequence = new Sequence(header, seqString);

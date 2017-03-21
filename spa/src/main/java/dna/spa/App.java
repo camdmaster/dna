@@ -27,10 +27,10 @@ public class App
 {
     public static void main( String[] args )
     {
-    	// start time
+    	// job start
     	long startTime = System.nanoTime();
     	
-    	// target sequence
+    	// read
     	ArrayList<Sequence> readList = null;
 
     	
@@ -73,9 +73,8 @@ public class App
 		}
     	
     	long endTime = System.nanoTime();
-    	
     	long lTime = endTime - startTime;
-    	System.out.println("TIME : " + lTime/1000000.0 + "(ms)");
+    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
     	System.out.println("Done.");
     }
     
