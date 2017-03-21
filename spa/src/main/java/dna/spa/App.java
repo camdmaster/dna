@@ -36,8 +36,19 @@ public class App
     	
     	try {
 //    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
+    		FastaReader reader = new FastaReader("/data1/yjseo/20170215/NC_018936_ffn_single.bwa.read1.fgs.faa");
     		readList = reader.read();
+//    		reader = new FastaReader("/data1/yjseo/20170215/NC_015214_ffn_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/20170215/NC_017340_ffn_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/20170215/NC_018140_ffn_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/20170215/NC_018936_ffn_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
+//    		readList = reader.read();
+    		
 //    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Staphylococcus_aureus_04_02981_uid161969/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa");
 //    		seqList = reader.read();
 //    		seqList.addAll(reader.read());
@@ -59,7 +70,7 @@ public class App
     		Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
     		assembly.makeGraph();
     		List<Sequence> seqList = assembly.getAssembledSequences();
-    		FastaWriter bw = new FastaWriter("/data1/yjseo/20170308/NC_018936_ffn_single.bwa.read1.fgs.asb.faa");
+    		FastaWriter bw = new FastaWriter("/data1/yjseo/20170316/test.bwa.read1.fgs.asb.faa");
     		for(Sequence seq: seqList) {
     			bw.write(seq);	
     		}

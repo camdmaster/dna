@@ -17,11 +17,13 @@ public class Assembly_SimpleGraphMethod {
 	private Graph seqGraph;
 	private SimplifiedGraph simplifiedGraph;
 	private List<Sequence> assembledSequences;
+	private int assembledNum;
 
 	public Assembly_SimpleGraphMethod(Graph sequenceGraph) {
 		this.seqGraph = sequenceGraph;
 		simplifiedGraph = new SimplifiedGraph();
 		assembledSequences = new ArrayList<Sequence>();
+		assembledNum = 0;
 	}
 	
 	public List<Sequence> getAssembledSequences() {
@@ -82,6 +84,8 @@ public class Assembly_SimpleGraphMethod {
     	
     	for(SimplifiedVertex svx: simplifiedGraph.getSVertexList())
     		seqGraph.removeVertex(svx.getVertex());
+    	
+    	System.out.println("Number of Simplified Vertices: " + simplifiedGraph.getSVertexList().size());
 	}
 	
 	/**
@@ -116,7 +120,8 @@ public class Assembly_SimpleGraphMethod {
 //    		count++;
 //    		System.out.println(count + " TIME : " + (et - st) /1000000.0 + " (ms)");
     	}
-    	return;
+    	
+    	System.out.println("Number of Simplified Edges: " + simplifiedGraph.getEdgeList().size());
     }
 	
 	/**
@@ -140,7 +145,8 @@ public class Assembly_SimpleGraphMethod {
 			}
 			// make sequence if size > 60
 			if(firstKey == null && lastKey == null && seq.size() >= 60) {
-				String header = Long.toString(System.currentTimeMillis());
+				assembledNum++;
+				String header = "sequence_nobranch_" + assembledNum;
 				String seqString = getSequenceString(seq);
 				Sequence sequence = new Sequence(header, seqString);
 				this.assembledSequences.add(sequence);
@@ -174,8 +180,9 @@ public class Assembly_SimpleGraphMethod {
 			traverseV2(seed, stack, seqStringListV2);
 			
 			for(String str1: seqStringListV1) {
-				for(String str2: seqStringListV1) {
-					String header = Long.toString(System.currentTimeMillis());
+				for(String str2: seqStringListV2) {
+					assembledNum++;
+					String header = "sequence_branch_" + assembledNum;
 					String seqString = str1 + str2;
 					Sequence seq = new Sequence(header, seqString);
 					this.assembledSequences.add(seq);
