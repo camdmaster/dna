@@ -12,7 +12,7 @@ public class Analysis {
 	private HashMap<String, Sequence> referenceList;
 	private HashMap<String, Sequence> assembleList;
 	private List<BlastResult> blastList;
-	private double minCoverage = 0.9;
+	private double minCoverage = 0.5;
 	private double minIdentity = 90.0;
 	private double specificity;
 	private double sensitivity;
@@ -69,7 +69,7 @@ public class Analysis {
 			String key = iter.next();
 			if(!matchedReference.contains(key)) {
 				count++;
-				System.out.println(count + " Ref: " + referenceList.get(key).getHeader());
+				System.out.println(count + "\t" + referenceList.get(key).getHeader() + "\t" + referenceList.get(key).getString().length());
 			}
 		}
 		

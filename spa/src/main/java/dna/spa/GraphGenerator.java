@@ -1,6 +1,7 @@
 package dna.spa;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import dna.graph.Edge;
 import dna.graph.Graph;
@@ -12,28 +13,29 @@ public class GraphGenerator {
 		
 	}
 	
-	public static Graph generate(ArrayList<Sequence> sequenceList) {
+	public static Graph generate(List<Sequence> sequenceList) {
 		long startTime = System.nanoTime();
 		System.out.println("<Graph Generation>");
     	// make graph
-    	Graph graph = new Graph();
+    	Graph graph = new Graph(sequenceList);
     	int vertexLength = 12;
     	int edgeLength = vertexLength + 1;
     	
-    	for(Sequence seq: sequenceList) {
+    	for(int j=0; j<sequenceList.size(); j++) {
+//    	for(Sequence seq: sequenceList) {
+    		Sequence seq = sequenceList.get(j);
     		String string = seq.getString();
     		int sequenceLength = string.length();
     		
     		String v = string.substring(0, vertexLength);
     		Vertex vertex = null;
-//    		String fragID = parseReadHeader(seq.getHeader());
         	if(graph.existVertex(v)) {
     			vertex = graph.getVertex(v);
     			vertex.addCoverage();
-//    			vertex.addReadFragmentIDList(fragID);
+    			vertex.addReadIndex(j);
     		} else {
     			vertex = new Vertex(v);
-//    			vertex.addReadFragmentIDList(fragID);
+    			vertex.addReadIndex(j);
     			graph.addVertex(vertex);
     		}
         	
@@ -48,9 +50,10 @@ public class GraphGenerator {
     			if(graph.existVertex(v2)) {
     				vertex2 = graph.getVertex(v2);
     				vertex2.addCoverage();
-//    				vertex2.addReadFragmentIDList(fragID);
+    				vertex2.addReadIndex(j);
     			} else {
     				vertex2 = new Vertex(v2);
+    				vertex2.addReadIndex(j);
 //    				vertex2.addReadFragmentIDList(fragID);
     				graph.addVertex(vertex2);
     			}

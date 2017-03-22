@@ -22,7 +22,6 @@ import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
 
 
-
 /**
  * Start Point
  *
@@ -44,12 +43,7 @@ public class App
     	long startTime = System.nanoTime();
     	
     	assembleRead();
-    	
-//    	try {
-//			Analyze();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+//    	Analyze();
 
     	long endTime = System.nanoTime();
     	long lTime = endTime - startTime;
@@ -62,7 +56,7 @@ public class App
      */
     private static void assembleRead() {
     	ArrayList<Sequence> readList = null;
-    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_015214_ffn_single.bwa.read1.fgs.faa");
+    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\bacteria_5\\NC_015214_ffn_single.bwa.read1.fgs.faa");
 		try {
 			readList = reader.read();
 			
@@ -71,7 +65,7 @@ public class App
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();
-			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\data\\test.faa");
+			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\test.asb.faa");
 			for(Sequence seq: seqList) {
 				bw.write(seq);
 			}
@@ -87,38 +81,47 @@ public class App
      * Assembled sequence analysis 
      * @throws IOException 
      */
-    private static void Analyze() throws IOException {
-    	// assembled sequence
-    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_014034_ffn_single.bwa.read1.fgs.asb.faa";
-    	FastaReader afr = new FastaReader(afileName);
-    	List<Sequence> assembleList = afr.read();
-    	HashMap<String, Sequence> assembleMap = new HashMap<String, Sequence>();
-    	for(Sequence seq: assembleList)
-    		assembleMap.put(seq.getHeader(), seq);
+    private static void Analyze() {
     	
-    	// reference sequence
-    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_014034.faa";
-    	FastaReader rfr = new FastaReader(rfileName);
-    	List<Sequence> referenceList = rfr.read();
-    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
-    	for(Sequence seq: referenceList)
-    		referenceMap.put(seq.getHeader(), seq);
+		try {
+			// assembled sequence
+	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\B5_014034_015214_017340_018140_018936.sequence.fgs.asb.faa";
+	    	FastaReader afr = new FastaReader(afileName);
+	    	List<Sequence> assembleList;
+			assembleList = afr.read();
+			
+			HashMap<String, Sequence> assembleMap = new HashMap<String, Sequence>();
+	    	for(Sequence seq: assembleList)
+	    		assembleMap.put(seq.getHeader(), seq);
+	    	
+	    	// reference sequence
+	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\B5_014034_015214_017340_018140_018936.faa";
+	    	FastaReader rfr = new FastaReader(rfileName);
+	    	List<Sequence> referenceList = rfr.read();
+	    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
+	    	for(Sequence seq: referenceList)
+	    		referenceMap.put(seq.getHeader(), seq);
+	    	
+	    	// blast result
+	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\B5_014034_015214_017340_018140_018936_seq_blastp+.out";
+	    	BlastReader br = new BlastReader(fileName);
+	    	List<BlastResult> bList = br.readTable();
+	    	
+			// Analysis
+	    	Analysis analysis = new Analysis(referenceMap, assembleMap, bList);
+	    	analysis.analyze();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
-    	// blast result
-    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_014034_blastp.out";
-    	BlastReader br = new BlastReader(fileName);
-    	List<BlastResult> bList = br.readTable();
-    	
-		// Analysis
-    	Analysis analysis = new Analysis(referenceMap, assembleMap, bList);
-    	analysis.analyze();
     }
     
     
     @Deprecated
-    private static Graph makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
+    private static Graph makeGraph(List<Sequence> sequenceList) throws IOException {
     	// make graph
-    	Graph graph = new Graph();
+    	Graph graph = new Graph(sequenceList);
     	int vertexLength = 12;
     	int edgeLength = vertexLength + 1;
     	
