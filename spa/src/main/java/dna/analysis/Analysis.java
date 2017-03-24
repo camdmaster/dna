@@ -12,7 +12,7 @@ public class Analysis {
 	private HashMap<String, Sequence> referenceList;
 	private HashMap<String, Sequence> assembleList;
 	private List<BlastResult> blastList;
-	private double minCoverage = 0.5;
+	private double minCoverage = 0.9;
 	private double minIdentity = 90.0;
 	private double specificity;
 	private double sensitivity;

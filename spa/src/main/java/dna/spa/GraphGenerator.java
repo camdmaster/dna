@@ -1,6 +1,5 @@
 package dna.spa;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dna.graph.Edge;
@@ -18,7 +17,7 @@ public class GraphGenerator {
 		System.out.println("<Graph Generation>");
     	// make graph
     	Graph graph = new Graph(sequenceList);
-    	int vertexLength = 12;
+    	int vertexLength = Preference.VERTEX_SIZE;
     	int edgeLength = vertexLength + 1;
     	
     	for(int j=0; j<sequenceList.size(); j++) {

@@ -176,12 +176,14 @@ public class Assembly_SimpleGraphMethod {
 				sEdge.setV2(simplifiedGraph.getSVertex(lastKey));
 			}
 			// make sequence if size > 60
-			if(firstKey == null && lastKey == null && seq.size() >= 60) {
-				assembledNum++;
-				String header = "sequence_nobrach_" + assembledNum;
+			if(firstKey == null && lastKey == null) {
 				String seqString = getSequenceString(seq);
-				Sequence sequence = new Sequence(header, seqString);
-				this.assembledSequences.add(sequence);
+				if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
+					assembledNum++;
+					String header = "sequence_nobranch_" + assembledNum;
+					Sequence sequence = new Sequence(header, seqString);
+					this.assembledSequences.add(sequence);	
+				}
 				tempSEdge.add(sEdge);
 			}
 		}
@@ -213,11 +215,13 @@ public class Assembly_SimpleGraphMethod {
 			
 			for(String str1: seqStringListV1) {
 				for(String str2: seqStringListV2) {
-					assembledNum++;
-					String header = "sequence_branch_" + assembledNum;
 					String seqString = str1 + str2;
-					Sequence seq = new Sequence(header, seqString);
-					this.assembledSequences.add(seq);
+					if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
+						assembledNum++;
+						String header = "sequence_branch_" + assembledNum;
+						Sequence seq = new Sequence(header, seqString);
+						this.assembledSequences.add(seq);	
+					}
 				}
 			}
 			
@@ -236,6 +240,7 @@ public class Assembly_SimpleGraphMethod {
 			edgeList = vertex.getEdgeList();
 		}
 		judgeBranch(edgeList);
+		int traverseCount = 0;
 		for(SimplifiedEdge edge: edgeList) {
 			if(edge.visited_traversal)
 				continue;
@@ -243,25 +248,41 @@ public class Assembly_SimpleGraphMethod {
 				SimplifiedVertex edgeV2 = edge.getV2();
 				SimplifiedVertex seedV1 = seedEdge.getV1();
 				if(seedV1 != null && edgeV2 != null && edgeV2 == seedV1) {
+					traverseCount++;
+					
+					// check coverage & read distribution
+					List<Integer> readListSeed = seedEdge.getSequence().get(0).getReadIndexList();
+					List<Integer> readListTarget = edge.getSequence().get(edge.getSequence().size()-1).getReadIndexList();
+					int coverageGap = Math.abs(readListSeed.size() - readListTarget.size());
+					int matchCount = 0;
+					for(int read: readListSeed) {
+						if(readListTarget.contains(read))
+							matchCount++;
+					}
+					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
+							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
+					
 					stack.push(edge);
 					traverseV1(edge, stack, seqStringList);
 				}
 			}
 		}
 		
-		StringBuilder sb = new StringBuilder();
-		Vertex firstVx = stack.peek().getSequence().get(0); 
-		sb.append(firstVx.getString().substring(0, firstVx.getString().length()-1));
-		for(int i=stack.size()-1; i>=0; i--) {
-			SimplifiedEdge e = stack.get(i);
-			for(Vertex v: e.getSequence())
-				sb.append(v.getString().substring(v.getString().length()-1));
-			if(i!=0) {
-				Vertex svx = e.getV2().getVertex();
-				sb.append(svx.getString().substring(svx.getString().length()-1));
+		if(vertex == null || traverseCount == 0) {
+			StringBuilder sb = new StringBuilder();
+			Vertex firstVx = stack.peek().getSequence().get(0); 
+			sb.append(firstVx.getString().substring(0, firstVx.getString().length()-1));
+			for(int i=stack.size()-1; i>=0; i--) {
+				SimplifiedEdge e = stack.get(i);
+				for(Vertex v: e.getSequence())
+					sb.append(v.getString().substring(v.getString().length()-1));
+				if(i!=0) {
+					Vertex svx = e.getV2().getVertex();
+					sb.append(svx.getString().substring(svx.getString().length()-1));
+				}
 			}
+			seqStringList.add(sb.toString());
 		}
-		seqStringList.add(sb.toString());
 		
 		stack.pop();
 	}
@@ -269,9 +290,10 @@ public class Assembly_SimpleGraphMethod {
 	private void judgeBranch(List<SimplifiedEdge> edgeList) {
 		List<SimplifiedEdge> tempList = new ArrayList<SimplifiedEdge>();
 		for(SimplifiedEdge edge: edgeList) {
-			if(!edge.visited_traversal && !(isShort(edge) && isTerminal(edge)))
-				tempList.add(edge);
-			else
+			if(!edge.visited_traversal && !(isShort(edge) && isTerminal(edge))) {
+				if(!tempList.contains(edge))
+					tempList.add(edge);
+			} else
 				edge.visited_seed = true;
 		}
 		
@@ -301,7 +323,7 @@ public class Assembly_SimpleGraphMethod {
 	}
 	
 	private boolean isShort(SimplifiedEdge edge) {
-		return edge.getSequence().size() <= Preference.SHORT_VERTEX_SIZE;
+		return edge.getSequence().size() <= Preference.CUTOFF_TERMINAL_VERTEX_SIZE;
 	}
 	
 	private boolean isTerminal(SimplifiedEdge edge) {
@@ -323,6 +345,7 @@ public class Assembly_SimpleGraphMethod {
 			edgeList = vertex.getEdgeList();
 		}
 		judgeBranch(edgeList);
+		int traverseCount = 0;
 		for(SimplifiedEdge edge: edgeList) {
 			if(edge.visited_traversal)
 				continue;
@@ -330,27 +353,43 @@ public class Assembly_SimpleGraphMethod {
 				SimplifiedVertex edgeV1 = edge.getV1();
 				SimplifiedVertex seedV2 = seedEdge.getV2();
 				if(seedV2 != null && edgeV1 != null && edgeV1 == seedV2) {
+					traverseCount++;
+					
+					// check coverage & read distribution
+					List<Integer> readListSeed = seedEdge.getSequence().get(0).getReadIndexList();
+					List<Integer> readListTarget = edge.getSequence().get(edge.getSequence().size()-1).getReadIndexList();
+					int coverageGap = Math.abs(readListSeed.size() - readListTarget.size());
+					int matchCount = 0;
+					for(int read: readListSeed) {
+						if(readListTarget.contains(read))
+							matchCount++;
+					}
+					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
+							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
+					
 					stack.push(edge);
 					traverseV2(edge, stack, seqStringList);
 				}
 			}
 		}
 		
-		StringBuilder sb = new StringBuilder();
-		SimplifiedVertex first = stack.get(0).getV2();
-		if(first != null) {
-			Vertex firstVx = stack.get(0).getV2().getVertex(); 
-			sb.append(firstVx.getString().substring(firstVx.getString().length()-1));
-			for(int i=1; i<stack.size(); i++) {
-				SimplifiedEdge e = stack.get(i);
-				for(Vertex v: e.getSequence())
-					sb.append(v.getString().substring(v.getString().length()-1));
-				if(i!=stack.size()-1) {
-					Vertex svx = e.getV2().getVertex();
-					sb.append(svx.getString().substring(svx.getString().length()-1));
+		if(vertex == null || traverseCount == 0) {
+			StringBuilder sb = new StringBuilder();
+			SimplifiedVertex first = stack.get(0).getV2();
+			if(first != null) {
+				Vertex firstVx = stack.get(0).getV2().getVertex(); 
+				sb.append(firstVx.getString().substring(firstVx.getString().length()-1));
+				for(int i=1; i<stack.size(); i++) {
+					SimplifiedEdge e = stack.get(i);
+					for(Vertex v: e.getSequence())
+						sb.append(v.getString().substring(v.getString().length()-1));
+					if(i!=stack.size()-1) {
+						Vertex svx = e.getV2().getVertex();
+						sb.append(svx.getString().substring(svx.getString().length()-1));
+					}
 				}
+				seqStringList.add(sb.toString());
 			}
-			seqStringList.add(sb.toString());
 		}
 		
 		stack.pop();

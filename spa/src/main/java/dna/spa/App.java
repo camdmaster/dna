@@ -56,7 +56,7 @@ public class App
      */
     private static void assembleRead() {
     	ArrayList<Sequence> readList = null;
-    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\bacteria_5\\NC_015214_ffn_single.bwa.read1.fgs.faa");
+    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\bacteria_5\\NC_014034_ffn_single.bwa.read1.fgs.faa");
 		try {
 			readList = reader.read();
 			
@@ -65,7 +65,7 @@ public class App
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();
-			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\test.asb.faa");
+			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\test.asb.faa");
 			for(Sequence seq: seqList) {
 				bw.write(seq);
 			}
@@ -85,7 +85,7 @@ public class App
     	
 		try {
 			// assembled sequence
-	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\B5_014034_015214_017340_018140_018936.sequence.fgs.asb.faa";
+	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\NC_018936.sequence.asb.faa";
 	    	FastaReader afr = new FastaReader(afileName);
 	    	List<Sequence> assembleList;
 			assembleList = afr.read();
@@ -95,7 +95,7 @@ public class App
 	    		assembleMap.put(seq.getHeader(), seq);
 	    	
 	    	// reference sequence
-	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\B5_014034_015214_017340_018140_018936.faa";
+	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_018936.faa";
 	    	FastaReader rfr = new FastaReader(rfileName);
 	    	List<Sequence> referenceList = rfr.read();
 	    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
@@ -103,7 +103,7 @@ public class App
 	    		referenceMap.put(seq.getHeader(), seq);
 	    	
 	    	// blast result
-	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\B5_014034_015214_017340_018140_018936_seq_blastp+.out";
+	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\NC_018936_seq_blastp+.out";
 	    	BlastReader br = new BlastReader(fileName);
 	    	List<BlastResult> bList = br.readTable();
 	    	
