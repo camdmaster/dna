@@ -5,18 +5,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import dna.analysis.Analysis;
+import dna.analysis.BlastResult;
 import dna.assembly.Assembly_SimpleGraphMethod;
 import dna.graph.Edge;
 import dna.graph.Graph;
 import dna.graph.Vertex;
+import dna.spa.io.BlastReader;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
-
 
 
 /**
@@ -27,16 +30,34 @@ public class App
 {
     public static void main( String[] args )
     {
+		// depth first search
+//		Graph graph = makeGraph(readList);
+//		traverseGraph(graph);
+
+		// SPA based search
+//		Graph graph = GraphGenerator.generate(readList);
+//		SequenceGenerator sg = new SequenceGenerator(graph);
+//		sg.traverseGraph();
+    	
     	// job start
     	long startTime = System.nanoTime();
     	
-    	// read
-    	ArrayList<Sequence> readList = null;
+    	assembleRead();
+//    	Analyze();
 
-    	
-    	try {
-//    		seqList = makeTargetSequence();
-    		FastaReader reader = new FastaReader("/data1/yjseo/20170215/NC_018936_ffn_single.bwa.read1.fgs.faa");
+    	long endTime = System.nanoTime();
+    	long lTime = endTime - startTime;
+    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
+    	System.out.println("Done.");
+    }
+
+    /**
+     * Assemble by Simplified Graph Method
+     */
+    private static void assembleRead() {
+    	ArrayList<Sequence> readList = null;
+		try {
+			FastaReader reader = new FastaReader("/data1/yjseo/faa_db+/NC_014034.faa");
     		readList = reader.read();
 //    		reader = new FastaReader("/data1/yjseo/20170215/NC_015214_ffn_single.bwa.read1.fgs.faa");
 //    		readList.addAll(reader.read());
@@ -55,44 +76,69 @@ public class App
 //    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
 //    		seqList = reader.read();
 //    		seqList.addAll(reader.read());
-    		
-    		// depth first search
-//    		Graph graph = makeGraph(readList);
-//    		traverseGraph(graph);
-
-    		// SPA based search
-//    		Graph graph = GraphGenerator.generate(readList);
-//    		SequenceGenerator sg = new SequenceGenerator(graph);
-//    		sg.traverseGraph();
-    		
-    		// simplified graph method
-    		Graph graph = GraphGenerator.generate(readList);
-    		Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
-    		assembly.makeGraph();
-    		List<Sequence> seqList = assembly.getAssembledSequences();
-    		FastaWriter bw = new FastaWriter("/data1/yjseo/20170316/test.bwa.read1.fgs.asb.faa");
-    		for(Sequence seq: seqList) {
-    			bw.write(seq);	
-    		}
-    		bw.close();
-    		
-    		
-//    		printVertexOrderedByCoverage(graph);
-		} catch (IOException e2) {
+			
+			// simplified graph method
+			Graph graph = GraphGenerator.generate(readList);
+			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
+			assembly.makeGraph();
+			List<Sequence> seqList = assembly.getAssembledSequences();
+			FastaWriter bw = new FastaWriter("/data1/yjseo/20170323/NC_014034.sequence.asb.faa");
+			for(Sequence seq: seqList) {
+				bw.write(seq);
+			}
+			bw.close();
+			
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e2.printStackTrace();
+			e.printStackTrace();
+		}
+    }
+  
+    /**
+     * Assembled sequence analysis 
+     * @throws IOException 
+     */
+    private static void Analyze() {
+    	
+		try {
+			// assembled sequence
+	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\B5_014034_015214_017340_018140_018936.sequence.fgs.asb.faa";
+	    	FastaReader afr = new FastaReader(afileName);
+	    	List<Sequence> assembleList;
+			assembleList = afr.read();
+			
+			HashMap<String, Sequence> assembleMap = new HashMap<String, Sequence>();
+	    	for(Sequence seq: assembleList)
+	    		assembleMap.put(seq.getHeader(), seq);
+	    	
+	    	// reference sequence
+	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\B5_014034_015214_017340_018140_018936.faa";
+	    	FastaReader rfr = new FastaReader(rfileName);
+	    	List<Sequence> referenceList = rfr.read();
+	    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
+	    	for(Sequence seq: referenceList)
+	    		referenceMap.put(seq.getHeader(), seq);
+	    	
+	    	// blast result
+	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170321\\B5_014034_015214_017340_018140_018936_seq_blastp+.out";
+	    	BlastReader br = new BlastReader(fileName);
+	    	List<BlastResult> bList = br.readTable();
+	    	
+			// Analysis
+	    	Analysis analysis = new Analysis(referenceMap, assembleMap, bList);
+	    	analysis.analyze();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     	
-    	long endTime = System.nanoTime();
-    	long lTime = endTime - startTime;
-    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
-    	System.out.println("Done.");
     }
     
+    
     @Deprecated
-    private static Graph makeGraph(ArrayList<Sequence> sequenceList) throws IOException {
+    private static Graph makeGraph(List<Sequence> sequenceList) throws IOException {
     	// make graph
-    	Graph graph = new Graph();
+    	Graph graph = new Graph(sequenceList);
     	int vertexLength = 12;
     	int edgeLength = vertexLength + 1;
     	

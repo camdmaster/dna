@@ -7,15 +7,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import dna.spa.Sequence;
+
 
 public class Graph {
 	
 	HashMap<String, Vertex> vertexMap;
 	HashMap<String, Edge> edgeMap;
+	List<Sequence> readList;
 	
-	public Graph() {
+	public Graph(List<Sequence> readList) {
 		vertexMap = new HashMap<String, Vertex>();
 		edgeMap = new HashMap<String, Edge>();
+		this.readList = readList;
 	}
 	
 	public void addVertex(Vertex vertex) {

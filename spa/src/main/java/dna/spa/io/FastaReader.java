@@ -23,9 +23,8 @@ public class FastaReader {
     	int count = 0;
     	// get read
     	String line = br.readLine();
-//    	while(line != null && count != 150000) {
     	while(line != null) {
-    		String header = line.substring(1);
+    		String header = line.substring(1).split(" ")[0];
     		StringBuilder seq = new StringBuilder();
     		line = br.readLine();
     		while(line != null && !line.startsWith(">")) {

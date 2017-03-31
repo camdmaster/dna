@@ -8,7 +8,7 @@ import java.util.List;
 public class Vertex implements Comparable<Vertex> {
 
 	private ArrayList<Edge> edgeList;
-	private List<String> readFragmentIDList;
+	private List<Integer> readIndexList;
 	private String string;
 	private int coverage;
 	public double f_value;
@@ -22,7 +22,7 @@ public class Vertex implements Comparable<Vertex> {
 	public Vertex(String string) {
 		this();
 		this.string = string;
-		readFragmentIDList = new ArrayList<String>();
+		readIndexList = new ArrayList<Integer>();
 		this.coverage = 1;
 	}
 	
@@ -50,12 +50,12 @@ public class Vertex implements Comparable<Vertex> {
 		return edgeList.remove(edge);
 	}
 
-	public List<String> getReadFragmentIDList() {
-		return readFragmentIDList;
+	public List<Integer> getReadIndexList() {
+		return readIndexList;
 	}
 	
-	public void addReadFragmentIDList(String readFragID) {
-		readFragmentIDList.add(readFragID);
+	public void addReadIndex(int readIndex) {
+		readIndexList.add(readIndex);
 	}
 
 	@Override

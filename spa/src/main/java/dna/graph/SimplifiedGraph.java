@@ -2,6 +2,7 @@ package dna.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class SimplifiedGraph {
@@ -33,14 +34,22 @@ public class SimplifiedGraph {
 		edgeList.add(edge);
 	}
 
-	public List<SimplifiedEdge> getEdgeList() {
+	public List<SimplifiedEdge> getSEdgeList() {
 		return edgeList;
+	}
+	
+	public void resetVisited_Traversal(boolean flag) {
+		for(SimplifiedEdge edge: edgeList)
+			edge.visited_traversal = flag;
+		Iterator<Vertex> iter = vertexMap.keySet().iterator();
+		while(iter.hasNext())
+			vertexMap.get(iter.next()).visited_traversal = flag;
 	}
 	
 	public void removeVisited() {
 		for(int i=edgeList.size()-1; i>=0; i--) {
 			SimplifiedEdge edge = edgeList.get(i);
-			if(edge.visited)
+			if(edge.visited_traversal)
 				removeEdge(edge);
 		}
 		
