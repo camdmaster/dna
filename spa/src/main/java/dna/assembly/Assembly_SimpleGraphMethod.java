@@ -124,9 +124,11 @@ public class Assembly_SimpleGraphMethod {
 			for(Edge edge: edgeList) {
 				if(edge.getV2().equals(vertex) && !edge.visited) {
 					extVertex = edge.getV1();
+					if(extVertex.visited)
+						return;
 					extVertex.visited = true;
 					sequence.add(0, extVertex);
-					break;
+					return;
 				}
 			}
 			vertex = extVertex;
@@ -145,6 +147,8 @@ public class Assembly_SimpleGraphMethod {
 			for(Edge edge: edgeList) {
 				if(edge.getV1().equals(vertex) && !edge.visited) {
 					extVertex = edge.getV2();
+					if(extVertex.visited)
+						break;
 					extVertex.visited = true;
 					sequence.add(extVertex);
 					break;

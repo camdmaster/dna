@@ -2,7 +2,6 @@ package dna.analysis;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import dna.spa.Sequence;
@@ -56,22 +55,22 @@ public class Analysis {
 //				System.out.println("Asb: " + assembleList.get(asbID).getString());
 //				System.out.println("Ref: " + referenceList.get(refID).getString());
 //			}
-//			if(coverage < minCoverage && identity >= minIdentity) {
-//				System.out.println("Coverage: " + coverage + ", Identity: " + identity);
-//				System.out.println("Asb: " + assembleList.get(asbID).getString());
-//				System.out.println("Ref: " + referenceList.get(refID).getString());
-//			}
-		}
-		
-		int count = 0;
-		Iterator<String> iter = referenceList.keySet().iterator();
-		while(iter.hasNext()) {
-			String key = iter.next();
-			if(!matchedReference.contains(key)) {
-				count++;
-				System.out.println(count + "\t" + referenceList.get(key).getHeader() + "\t" + referenceList.get(key).getString().length());
+			if(coverage < minCoverage && identity >= minIdentity) {
+				System.out.println("Coverage: " + coverage + ", Identity: " + identity);
+				System.out.println("Asb: " + assembleList.get(asbID).getString());
+				System.out.println("Ref: " + referenceList.get(refID).getString());
 			}
 		}
+		
+//		int count = 0;
+//		Iterator<String> iter = referenceList.keySet().iterator();
+//		while(iter.hasNext()) {
+//			String key = iter.next();
+//			if(!matchedReference.contains(key)) {
+//				count++;
+//				System.out.println(count + "\t" + referenceList.get(key).getHeader() + "\t" + referenceList.get(key).getString().length());
+//			}
+//		}
 		
 		specificity = (double)matchedAssemble.size() / (double)assembleList.size();
 		sensitivity = (double)matchedReference.size() / (double)referenceList.size();

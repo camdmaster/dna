@@ -20,6 +20,7 @@ import dna.graph.Vertex;
 import dna.spa.io.BlastReader;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
+import dna.util.Blast;
 
 
 /**
@@ -28,6 +29,8 @@ import dna.spa.io.FastaWriter;
  */
 public class App 
 {
+	private static String readFilePath = "F:\\Dropbox\\DNA\\20160929_SPA\\bacteria_5\\NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa";
+	
     public static void main( String[] args )
     {
 		// depth first search
@@ -42,8 +45,9 @@ public class App
     	// job start
     	long startTime = System.nanoTime();
     	
-    	assembleRead();
+//    	assembleRead();
 //    	Analyze();
+    	testBlast();
 
     	long endTime = System.nanoTime();
     	long lTime = endTime - startTime;
@@ -56,7 +60,7 @@ public class App
      */
     private static void assembleRead() {
     	ArrayList<Sequence> readList = null;
-    	FastaReader reader = new FastaReader("F:\\Dropbox\\DNA\\20160929_SPA\\bacteria_5\\NC_014034_ffn_single.bwa.read1.fgs.faa");
+    	FastaReader reader = new FastaReader(readFilePath);
 		try {
 			readList = reader.read();
 			
@@ -85,7 +89,7 @@ public class App
     	
 		try {
 			// assembled sequence
-	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\NC_018936.sequence.asb.faa";
+	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170331\\bacteria5.asb.faa";
 	    	FastaReader afr = new FastaReader(afileName);
 	    	List<Sequence> assembleList;
 			assembleList = afr.read();
@@ -95,7 +99,7 @@ public class App
 	    		assembleMap.put(seq.getHeader(), seq);
 	    	
 	    	// reference sequence
-	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_018936.faa";
+	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\B5_014034_015214_017340_018140_018936.faa";
 	    	FastaReader rfr = new FastaReader(rfileName);
 	    	List<Sequence> referenceList = rfr.read();
 	    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
@@ -103,7 +107,7 @@ public class App
 	    		referenceMap.put(seq.getHeader(), seq);
 	    	
 	    	// blast result
-	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\NC_018936_seq_blastp+.out";
+	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170331\\bacteria5.blastp+.out";
 	    	BlastReader br = new BlastReader(fileName);
 	    	List<BlastResult> bList = br.readTable();
 	    	
@@ -115,6 +119,23 @@ public class App
 			e.printStackTrace();
 		}
     	
+    }
+    
+    private static void testBlast() {
+    	
+		try {
+			String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170331\\bacteria5.asb.faa";
+	    	FastaReader afr = new FastaReader(afileName);
+	    	List<Sequence> assembleList;
+			assembleList = afr.read();
+			
+			Blast blast = new Blast(assembleList);
+			blast.runBlast();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
     }
     
     
