@@ -29,10 +29,36 @@ import dna.util.Blast;
  */
 public class App 
 {
-	private static String readFilePath = "F:\\Dropbox\\DNA\\20160929_SPA\\bacteria_5\\NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa";
 	
     public static void main( String[] args )
-    {
+    {    	
+    	// set IO path
+    	Preference.INPUT_READ_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/bacteria_5/NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa";
+    	Preference.INPUT_BLASTDB_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/database/NC_018936.faa";
+    	Preference.OUTPUT_ASB_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/NC_018936.asb.faa";
+    	Preference.OUTPUT_BLAST_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/NC_018936.blast.out";
+    	Preference.OUTPUT_ANALYSIS_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/NC_018936.analysis.out";
+    	
+    	// job start
+    	long startTime = System.nanoTime();
+    	
+    	System.out.println("<< Assembly >>");
+    	assembleRead();
+    	System.out.println();
+    	
+    	System.out.println("<< Blast >>");
+    	searchBlastWithDB();
+    	System.out.println();
+    	
+    	System.out.println("<< Analysis >>");
+    	analyze();
+
+    	long endTime = System.nanoTime();
+    	long lTime = endTime - startTime;
+    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
+    	System.out.println("Done.");
+    	
+    	
 		// depth first search
 //		Graph graph = makeGraph(readList);
 //		traverseGraph(graph);
@@ -41,18 +67,6 @@ public class App
 //		Graph graph = GraphGenerator.generate(readList);
 //		SequenceGenerator sg = new SequenceGenerator(graph);
 //		sg.traverseGraph();
-    	
-    	// job start
-    	long startTime = System.nanoTime();
-    	
-//    	assembleRead();
-//    	Analyze();
-    	testBlast();
-
-    	long endTime = System.nanoTime();
-    	long lTime = endTime - startTime;
-    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
-    	System.out.println("Done.");
     }
 
     /**
@@ -60,7 +74,7 @@ public class App
      */
     private static void assembleRead() {
     	ArrayList<Sequence> readList = null;
-    	FastaReader reader = new FastaReader(readFilePath);
+    	FastaReader reader = new FastaReader(Preference.INPUT_READ_PATH);
 		try {
 			readList = reader.read();
 			
@@ -69,7 +83,7 @@ public class App
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();
-			FastaWriter bw = new FastaWriter("F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\test.asb.faa");
+			FastaWriter bw = new FastaWriter(Preference.OUTPUT_ASB_PATH);
 			for(Sequence seq: seqList) {
 				bw.write(seq);
 			}
@@ -80,17 +94,24 @@ public class App
 			e.printStackTrace();
 		}
     }
+   
+    /**
+     * Local Blast DB search
+     */
+    private static void searchBlastWithDB() {
+		Blast blast = new Blast(Preference.OUTPUT_ASB_PATH);
+		blast.runBlast();
+    }
   
     /**
      * Assembled sequence analysis 
      * @throws IOException 
      */
-    private static void Analyze() {
+    private static void analyze() {
     	
 		try {
 			// assembled sequence
-	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170331\\bacteria5.asb.faa";
-	    	FastaReader afr = new FastaReader(afileName);
+	    	FastaReader afr = new FastaReader(Preference.OUTPUT_ASB_PATH);
 	    	List<Sequence> assembleList;
 			assembleList = afr.read();
 			
@@ -99,43 +120,25 @@ public class App
 	    		assembleMap.put(seq.getHeader(), seq);
 	    	
 	    	// reference sequence
-	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\B5_014034_015214_017340_018140_018936.faa";
-	    	FastaReader rfr = new FastaReader(rfileName);
+	    	FastaReader rfr = new FastaReader(Preference.INPUT_BLASTDB_PATH);
 	    	List<Sequence> referenceList = rfr.read();
 	    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
 	    	for(Sequence seq: referenceList)
 	    		referenceMap.put(seq.getHeader(), seq);
 	    	
 	    	// blast result
-	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170331\\bacteria5.blastp+.out";
-	    	BlastReader br = new BlastReader(fileName);
+	    	BlastReader br = new BlastReader(Preference.OUTPUT_BLAST_PATH);
 	    	List<BlastResult> bList = br.readTable();
 	    	
 			// Analysis
 	    	Analysis analysis = new Analysis(referenceMap, assembleMap, bList);
 	    	analysis.analyze();
+	    	analysis.writeBlastResult();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
-    }
-    
-    private static void testBlast() {
-    	
-		try {
-			String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170331\\bacteria5.asb.faa";
-	    	FastaReader afr = new FastaReader(afileName);
-	    	List<Sequence> assembleList;
-			assembleList = afr.read();
-			
-			Blast blast = new Blast(assembleList);
-			blast.runBlast();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
     }
     
     
@@ -191,6 +194,7 @@ public class App
     	return graph;
     }
     
+    @Deprecated
     private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
     	BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/redundant.txt"));
     	List<Vertex> list = graph.getVerticeOrderedByCoverage();
@@ -201,6 +205,7 @@ public class App
     	bw.close();
     }
     
+    @Deprecated
     private static void traverseGraph(Graph graph) throws IOException {
     	// find seed
 //    	List<Vertex> seeds = graph.getSeedVertex();
@@ -244,6 +249,7 @@ public class App
     	bw.close();
     }
     
+    @Deprecated
     private static Vertex getSeed(Graph graph) {
     	Vertex seed = null;
     	Iterator<Vertex> iter = graph.getVertexMap().values().iterator();
@@ -258,7 +264,7 @@ public class App
     	return seed;
     }
     
-    
+    @Deprecated
     private static ArrayList<Sequence> makeTargetSequence() throws IOException {
     	File dir = new File("F:\\학교\\all_faa");
     	HashSet<String> speciesName = new HashSet<String>();

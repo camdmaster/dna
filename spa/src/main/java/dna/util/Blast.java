@@ -9,21 +9,39 @@ import dna.spa.io.FastaWriter;
 
 public class Blast {
 
-	private String blastp = "blastp.exe";
+//	private String blastp = "blastp.exe";
+	private String blastp = "blastp";
 	private String queryPath;
-	private String databasePath;
+	private String subjectPath;
 	private String outPath;
 	private double evalue;
 	private int outfmt;
 	private int threads;
+	private boolean searchDB;
 	
-	private List<Sequence> seqList;
+	private List<Sequence> querySeqList;
+	private List<Sequence> subjectSeqList;
 	
-	public Blast(List<Sequence> seqList) {
+	public Blast(List<Sequence> queryList) {
+		evalue = 1;
+		threads = 4;
+		outfmt = 5;
+		this.querySeqList = queryList;
+		searchDB = true;
+	}
+	
+	public Blast(List<Sequence> queryList, List<Sequence> targetList) {
+		this(queryList);
+		this.subjectSeqList = targetList;
+		searchDB = false;
+	}
+	
+	public Blast(String queryPath) {
+		this.queryPath = queryPath;
 		evalue = 1;
 		threads = 4;
 		outfmt = 6;
-		this.seqList = seqList;
+		searchDB = true;
 	}
 	
 	public void runBlast() {
@@ -38,24 +56,44 @@ public class Blast {
 	}
 	
 	private void prepareBlast() throws IOException {
-		makeQueryFile(seqList);
-		databasePath = "F:\\Dropbox\\DNA\\20160929_SPA\\database\\NC_014034.faa";
-		outPath = Preference.TEMP_PATH + "blast.out";
+		if(querySeqList != null)
+			makeFastaFile(querySeqList, true);
+		if(!searchDB) {
+			makeFastaFile(subjectSeqList, false);
+		}
+		outPath = Preference.OUTPUT_BLAST_PATH;
 	}
 	
-	private void makeQueryFile(List<Sequence> seqList) throws IOException {
-		queryPath = Preference.TEMP_PATH + "query.faa";
-		FastaWriter fw = new FastaWriter(queryPath);
+	private void makeFastaFile(List<Sequence> seqList, boolean isQuery) throws IOException {
+		String filePath;
+		if(isQuery) {
+			queryPath = Preference.TEMP_PATH + "query.faa";
+			filePath = queryPath;
+		} else {
+			subjectPath = Preference.TEMP_PATH + "subject.faa";
+			filePath = subjectPath;
+		}
+			
+		FastaWriter fw = new FastaWriter(filePath);
 		for(Sequence seq: seqList)
 			fw.write(seq);
 		fw.close();
 	}
 	
 	private void runCommand() {
-		String command = "\"" + Preference.BLAST_PLUS_PATH + blastp + "\" -query " + queryPath + " -db " + databasePath +
-				" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -num_threads " + threads;
+		String command;
+		if(searchDB) {
+			command = Preference.BLAST_PLUS_PATH + blastp + " -query " + queryPath + " -db " + Preference.INPUT_BLASTDB_PATH +
+			" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -max_target_seqs 1 -num_threads " + threads;			
+		} else {
+			command = Preference.BLAST_PLUS_PATH + blastp + " -query " + queryPath + " -subject " + subjectPath +
+					" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -max_target_seqs 1 -num_threads " +threads;	
+		}
+
+		
+		String[] cmd = command.split(" ");
 		try {
-			Process p = new ProcessBuilder(command).start();
+			Process p = new ProcessBuilder(cmd).start();
 			p.waitFor();
 		} catch (Exception e) {
 			e.printStackTrace();
