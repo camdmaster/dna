@@ -58,16 +58,16 @@ public class App
     	ArrayList<Sequence> readList = null;
 
 		try {
-			FastaReader reader = new FastaReader("/data1/yjseo/data/read/NC_014034_l150_d70_e0_single.bwa.read1.fgs.faa");
+			FastaReader reader = new FastaReader("/data1/yjseo/data/read/NC_014034_d70_e0_single/NC_014034_l150_d70_e0_single.bwa.read1.fgs.faa");
     		readList = reader.read();
-//    		reader = new FastaReader("/data1/yjseo/20170215/NC_015214_ffn_single.bwa.read1.fgs.faa");
-//    		readList.addAll(reader.read());
-//    		reader = new FastaReader("/data1/yjseo/20170215/NC_017340_ffn_single.bwa.read1.fgs.faa");
-//    		readList.addAll(reader.read());
-//    		reader = new FastaReader("/data1/yjseo/20170215/NC_018140_ffn_single.bwa.read1.fgs.faa");
-//    		readList.addAll(reader.read());
-//    		reader = new FastaReader("/data1/yjseo/20170215/NC_018936_ffn_single.bwa.read1.fgs.faa");
-//    		readList.addAll(reader.read());
+    		reader = new FastaReader("/data1/yjseo/data/read/NC_015214_d30_e0_single/NC_015214_l150_d30_e0_single.bwa.read1.fgs.faa");
+    		readList.addAll(reader.read());
+    		reader = new FastaReader("/data1/yjseo/data/read/NC_017340_d80_e0_single/NC_017340_l150_d80_e0_single.bwa.read1.fgs.faa");
+    		readList.addAll(reader.read());
+    		reader = new FastaReader("/data1/yjseo/data/read/NC_018140_d100_e0_single/NC_018140_l150_d100_e0_single.bwa.read1.fgs.faa");
+    		readList.addAll(reader.read());
+    		reader = new FastaReader("/data1/yjseo/data/read/NC_018936_d50_e0_single/NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa");
+    		readList.addAll(reader.read());
 //    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
 //    		readList = reader.read();
     		
@@ -83,7 +83,7 @@ public class App
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();
-			FastaWriter bw = new FastaWriter("/data1/yjseo/20170323/NC_014034.sequence.asb.faa");
+			FastaWriter bw = new FastaWriter("/data1/yjseo/20170331/bacteria5.asb.faa");
 			for(Sequence seq: seqList) {
 				bw.write(seq);
 			}
