@@ -176,12 +176,15 @@ public class Assembly_SimpleGraphMethod {
 				sEdge.setV2(simplifiedGraph.getSVertex(lastKey));
 			}
 			// make sequence if size > 60
-			if(firstKey == null && lastKey == null && seq.size() >= 60) {
-				assembledNum++;
-				String header = "sequence_nobranch_" + assembledNum;
+
+			if(firstKey == null && lastKey == null) {
 				String seqString = getSequenceString(seq);
-				Sequence sequence = new Sequence(header, seqString);
-				this.assembledSequences.add(sequence);
+				if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
+					assembledNum++;
+					String header = "sequence_nobranch_" + assembledNum;
+					Sequence sequence = new Sequence(header, seqString);
+					this.assembledSequences.add(sequence);	
+				}
 				tempSEdge.add(sEdge);
 			}
 		}
@@ -210,15 +213,15 @@ public class Assembly_SimpleGraphMethod {
 			stack.push(seed);
 			List<String> seqStringListV2 = new ArrayList<String>();
 			traverseV2(seed, stack, seqStringListV2);
-			
 			for(String str1: seqStringListV1) {
 				for(String str2: seqStringListV2) {
 					String seqString = str1 + str2;
-					if(seqString.length() >= 60) {
+
+					if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
 						assembledNum++;
 						String header = "sequence_branch_" + assembledNum;
 						Sequence seq = new Sequence(header, seqString);
-						this.assembledSequences.add(seq);
+						this.assembledSequences.add(seq);	
 					}
 				}
 			}
@@ -247,6 +250,20 @@ public class Assembly_SimpleGraphMethod {
 				SimplifiedVertex edgeV2 = edge.getV2();
 				SimplifiedVertex seedV1 = seedEdge.getV1();
 				if(seedV1 != null && edgeV2 != null && edgeV2 == seedV1) {
+					traverseCount++;
+					
+					// check coverage & read distribution
+					List<Integer> readListSeed = seedEdge.getSequence().get(0).getReadIndexList();
+					List<Integer> readListTarget = edge.getSequence().get(edge.getSequence().size()-1).getReadIndexList();
+					int coverageGap = Math.abs(readListSeed.size() - readListTarget.size());
+					int matchCount = 0;
+					for(int read: readListSeed) {
+						if(readListTarget.contains(read))
+							matchCount++;
+					}
+					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
+							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
+					
 					stack.push(edge);
 					traverseV1(edge, stack, seqStringList);
 				}
@@ -275,10 +292,10 @@ public class Assembly_SimpleGraphMethod {
 	private void judgeBranch(List<SimplifiedEdge> edgeList) {
 		List<SimplifiedEdge> tempList = new ArrayList<SimplifiedEdge>();
 		for(SimplifiedEdge edge: edgeList) {
-			if(!edge.visited_traversal && !(isShort(edge) && isTerminal(edge)))
+			if(!edge.visited_traversal && !(isShort(edge) && isTerminal(edge))) {
 				if(!tempList.contains(edge))
 					tempList.add(edge);
-			else
+			} else
 				edge.visited_seed = true;
 		}
 		
@@ -308,7 +325,7 @@ public class Assembly_SimpleGraphMethod {
 	}
 	
 	private boolean isShort(SimplifiedEdge edge) {
-		return edge.getSequence().size() <= Preference.SHORT_VERTEX_SIZE;
+		return edge.getSequence().size() <= Preference.CUTOFF_TERMINAL_VERTEX_SIZE;
 	}
 	
 	private boolean isTerminal(SimplifiedEdge edge) {
@@ -339,6 +356,20 @@ public class Assembly_SimpleGraphMethod {
 				SimplifiedVertex edgeV1 = edge.getV1();
 				SimplifiedVertex seedV2 = seedEdge.getV2();
 				if(seedV2 != null && edgeV1 != null && edgeV1 == seedV2) {
+					traverseCount++;
+					
+					// check coverage & read distribution
+					List<Integer> readListSeed = seedEdge.getSequence().get(0).getReadIndexList();
+					List<Integer> readListTarget = edge.getSequence().get(edge.getSequence().size()-1).getReadIndexList();
+					int coverageGap = Math.abs(readListSeed.size() - readListTarget.size());
+					int matchCount = 0;
+					for(int read: readListSeed) {
+						if(readListTarget.contains(read))
+							matchCount++;
+					}
+					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
+							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
+					
 					stack.push(edge);
 					traverseV2(edge, stack, seqStringList);
 				}
