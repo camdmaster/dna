@@ -10,8 +10,11 @@ public class Preference {
 //	public static String BLAST_PLUS_PATH = "E:\\Program Files\\NCBI\\blast-2.6.0+\\bin\\";
 	public static String BLAST_PLUS_PATH = "/usr/local/ncbi/blast/bin/";
 	
+	public static String FRAGGENESCAN_PATH = "/usr/local/FragGeneScan1.30";
+	
 	public static String TEMP_PATH = "/Users/camdmaster/Documents/temp/";
 	
+	public static String INPUT_DNA_READ_PATH;
 	public static String INPUT_READ_PATH;
 	public static String INPUT_BLASTDB_PATH;
 	public static String OUTPUT_ASB_PATH;

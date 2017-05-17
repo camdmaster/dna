@@ -215,7 +215,7 @@ public class Graph {
 		List<Vertex> vlist = new ArrayList<Vertex>(vertexMap.values());
 		for(Vertex v: vlist) {
 			if(v.getEdgeList().size() == 0)
-				removeVertex(v);
+				removeVertexAndConnectedEdges(v);
 //			if(v.visited)
 //				vertexMap.remove(v.getString());
 		}
@@ -227,7 +227,7 @@ public class Graph {
 		edge.getV2().removeEdge(edge);
 	}
 	
-	public void removeVertex(Vertex vertex) {
+	public void removeVertexAndConnectedEdges(Vertex vertex) {
 		vertexMap.remove(vertex.getString());
 		while(vertex.getEdgeList().size() != 0) {
 			Edge e = vertex.getEdgeList().get(0);
@@ -237,5 +237,9 @@ public class Graph {
 //			Edge e = vertex.getEdgeList().get(i);
 //			removeEdge(e);
 //		}
+	}
+	
+	public void removeVertexOnly(Vertex vertex) {
+		vertexMap.remove(vertex.getString());
 	}
 }

@@ -21,6 +21,7 @@ import dna.spa.io.BlastReader;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
 import dna.util.Blast;
+import dna.util.FragGeneScan;
 
 
 /**
@@ -33,25 +34,21 @@ public class App
     public static void main( String[] args )
     {    	
     	// set IO path
-    	Preference.INPUT_READ_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/bacteria_5/NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa";
+    	Preference.INPUT_READ_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/20161216_protein_3_read.faa";
     	Preference.INPUT_BLASTDB_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/database/NC_018936.faa";
-    	Preference.OUTPUT_ASB_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/NC_018936.asb.faa";
+    	Preference.OUTPUT_ASB_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/20161216_protein_3.asb.faa";
     	Preference.OUTPUT_BLAST_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/NC_018936.blast.out";
     	Preference.OUTPUT_ANALYSIS_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/20170417/NC_018936.analysis.out";
     	
     	// job start
     	long startTime = System.nanoTime();
     	
-    	System.out.println("<< Assembly >>");
-    	assembleRead();
-    	System.out.println();
+    	job_main();
     	
-    	System.out.println("<< Blast >>");
-    	searchBlastWithDB();
-    	System.out.println();
-    	
-    	System.out.println("<< Analysis >>");
-    	analyze();
+//    	Preference.INPUT_DNA_READ_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/NC_018936_l150_d50_e0_single.bwa.read1.fasta";
+//    	Preference.INPUT_DNA_READ_PATH = "/Users/camdmaster/Dropbox/DNA/20160929_SPA/data/test_dna.fasta";
+//    	FragGeneScan fgs = new FragGeneScan();
+//    	fgs.runScan();
 
     	long endTime = System.nanoTime();
     	long lTime = endTime - startTime;
@@ -67,6 +64,19 @@ public class App
 //		Graph graph = GraphGenerator.generate(readList);
 //		SequenceGenerator sg = new SequenceGenerator(graph);
 //		sg.traverseGraph();
+    }
+    
+    private static void job_main() {
+    	System.out.println("<< Assembly >>");
+    	assembleRead();
+    	System.out.println();
+    	
+//    	System.out.println("<< Blast >>");
+//    	searchBlastWithDB();
+//    	System.out.println();
+//    	
+//    	System.out.println("<< Analysis >>");
+//    	analyze();
     }
 
     /**
