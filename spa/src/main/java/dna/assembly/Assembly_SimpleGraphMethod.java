@@ -77,16 +77,19 @@ public class Assembly_SimpleGraphMethod {
     				simplifiedGraph.addSVertex(svx);
     				
     				for(Edge e: vx.getEdgeList()) {
-    					e.getV1().simplifiedVertexKey = vx;
-    					e.getV2().simplifiedVertexKey = vx;
+    					if(e.getV1() == vx)
+    						e.getV2().simplifiedVertexKey = vx;
+    					if(e.getV2() == vx)
+    						e.getV1().simplifiedVertexKey = vx;
     				}
     			}
     	}
     	
-    	for(SimplifiedVertex svx: simplifiedGraph.getSVertexList())
-    		seqGraph.removeVertex(svx.getVertex());
+//    	for(SimplifiedVertex svx: simplifiedGraph.getSVertexList())
+//    		seqGraph.removeVertexOnly(svx.getVertex());
     	
     	System.out.println("Number of Simplified Vertices: " + simplifiedGraph.getSVertexList().size());
+    	    	
 	}
 	
 	/**
@@ -111,6 +114,11 @@ public class Assembly_SimpleGraphMethod {
     	}
     	
     	System.out.println("Number of Simplified Edges: " + simplifiedGraph.getSEdgeList().size());
+    	
+    	for(Vertex v: seqGraph.getSeedVertex()) {
+    		if(!v.visited)
+    			System.out.println("false visited v" + v.getString());
+    	}
     }
 	
 	/**
@@ -123,7 +131,7 @@ public class Assembly_SimpleGraphMethod {
 			ArrayList<Edge> edgeList = vertex.getEdgeList();
 			Vertex extVertex = null;
 			for(Edge edge: edgeList) {
-				if(edge.getV2().equals(vertex) && !edge.visited) {
+				if(edge.getV2().equals(vertex)) {
 					extVertex = edge.getV1();
 					if(extVertex.visited)
 						return;
@@ -147,7 +155,7 @@ public class Assembly_SimpleGraphMethod {
 			ArrayList<Edge> edgeList = vertex.getEdgeList();
 			Vertex extVertex = null;
 			for(Edge edge: edgeList) {
-				if(edge.getV1().equals(vertex) && !edge.visited) {
+				if(edge.getV1().equals(vertex)) {
 					extVertex = edge.getV2();
 					if(extVertex.visited)
 						return;
@@ -187,7 +195,7 @@ public class Assembly_SimpleGraphMethod {
 				String seqString = getSequenceString(seq);
 				if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
 					assembledNum++;
-					String header = "sequence_nobranch_" + assembledNum;
+					String header = "nobranch_" + assembledNum;
 					Sequence sequence = new Sequence(header, seqString);
 					this.assembledSequences.add(sequence);	
 				}
@@ -197,6 +205,11 @@ public class Assembly_SimpleGraphMethod {
 		
 		for(SimplifiedEdge e: tempSEdge)
 			simplifiedGraph.removeEdge(e);
+		
+		for(SimplifiedVertex sv: simplifiedGraph.getSVertexList()) {
+			if(sv.getEdgeList().size() == 0)
+				System.out.println("false negative SV: " + sv.getVertex().getString());
+		}
 		
 		return;
 	}
@@ -225,7 +238,7 @@ public class Assembly_SimpleGraphMethod {
 
 					if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
 						assembledNum++;
-						String header = "sequence_branch_" + assembledNum;
+						String header = "branch_" + assembledNum;
 						Sequence seq = new Sequence(header, seqString);
 						this.assembledSequences.add(seq);	
 					}
@@ -238,7 +251,7 @@ public class Assembly_SimpleGraphMethod {
 	
 	private void traverseV1(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack, List<String> seqStringList) {
 		SimplifiedVertex vertex = seedEdge.getV1();
-		seedEdge.visited_traversal = true;
+//		seedEdge.visited_traversal = true;
 		seedEdge.visited_seed = true;
 		List<SimplifiedEdge> edgeList = new ArrayList<SimplifiedEdge>();
 		if(vertex != null && !vertex.visited_traversal) {
@@ -267,8 +280,8 @@ public class Assembly_SimpleGraphMethod {
 						if(readListTarget.contains(read))
 							matchCount++;
 					}
-					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
-							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
+//					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
+//							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
 					
 					stack.push(edge);
 					traverseV1(edge, stack, seqStringList);
@@ -344,7 +357,7 @@ public class Assembly_SimpleGraphMethod {
 	
 	private void traverseV2(SimplifiedEdge seedEdge, Stack<SimplifiedEdge> stack, List<String> seqStringList) {
 		SimplifiedVertex vertex = seedEdge.getV2();
-		seedEdge.visited_traversal = true;
+//		seedEdge.visited_traversal = true;
 		seedEdge.visited_seed = true;
 		List<SimplifiedEdge> edgeList = new ArrayList<SimplifiedEdge>();
 		if(vertex != null && !vertex.visited_traversal) {
@@ -373,8 +386,8 @@ public class Assembly_SimpleGraphMethod {
 						if(readListTarget.contains(read))
 							matchCount++;
 					}
-					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
-							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
+//					System.out.println("Coverage Gap: " + coverageGap + "\tMatching (Seed, Target): " + matchCount +
+//							"/" + readListSeed.size() + ", " + matchCount + "/" + readListTarget.size());
 					
 					stack.push(edge);
 					traverseV2(edge, stack, seqStringList);

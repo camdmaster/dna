@@ -7,6 +7,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import dna.analysis.BlastResult;
 
 public class BlastReader {
@@ -45,6 +56,38 @@ public class BlastReader {
     	br.close();
     	
     	return blastList;
+	}
+	
+	public void readXML(BlastResult br) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+		InputSource is = new InputSource(new FileReader(fileName));
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setValidating(false);
+		factory.setFeature("http://xml.org/sax/features/namespaces", false);
+		factory.setFeature("http://xml.org/sax/features/validation", false);
+		factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+		factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+
+		Document document = factory.newDocumentBuilder().parse(is);
+//		document.getDocumentElement().normalize();
+
+		NodeList nodeList = document.getElementsByTagName("Hsp").item(0).getChildNodes();
+		for(int i=0; i<nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if(node instanceof Element) {
+//				if(node.getNodeName().equals("Hsp_qseq"))
+//					System.out.println("que: " + node.getTextContent());
+//				if(node.getNodeName().equals("Hsp_hseq"))
+//					System.out.println("sub: " + node.getTextContent());
+				if(node.getNodeName().equals("Hsp_midline"))
+					br.setMatchedString(node.getTextContent());
+//					System.out.println("mid: " + node.getTextContent());
+//				System.out.println(node.getNodeName() + " " + node.getTextContent());
+			}
+				
+		}
+
+
 	}
 	
 }

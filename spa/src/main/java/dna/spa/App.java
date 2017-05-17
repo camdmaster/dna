@@ -20,6 +20,7 @@ import dna.graph.Vertex;
 import dna.spa.io.BlastReader;
 import dna.spa.io.FastaReader;
 import dna.spa.io.FastaWriter;
+import dna.util.Blast;
 
 
 /**
@@ -28,8 +29,36 @@ import dna.spa.io.FastaWriter;
  */
 public class App 
 {
+	
     public static void main( String[] args )
-    {
+    {    	
+    	// set IO path
+    	Preference.INPUT_READ_PATH = "/data1/yjseo/data/read/NC_014034_d70_e0_single/NC_014034_l150_d70_e0_single.bwa.read1.fgs.faa";
+    	Preference.INPUT_BLASTDB_PATH = "/data1/yjseo/data/faa_db/NC_014034.faa";
+    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20170419/NC_014034.asb.faa";
+    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20170419/NC_014034.blast.out";
+    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20170419/NC_014034.analysis.out";
+    	
+    	// job start
+    	long startTime = System.nanoTime();
+    	
+    	System.out.println("<< Assembly >>");
+    	assembleRead();
+    	System.out.println();
+    	
+//    	System.out.println("<< Blast >>");
+//    	searchBlastWithDB();
+//    	System.out.println();
+//    	
+//    	System.out.println("<< Analysis >>");
+//    	analyze();
+
+    	long endTime = System.nanoTime();
+    	long lTime = endTime - startTime;
+    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
+    	System.out.println("Done.");
+    	
+    	
 		// depth first search
 //		Graph graph = makeGraph(readList);
 //		traverseGraph(graph);
@@ -38,17 +67,6 @@ public class App
 //		Graph graph = GraphGenerator.generate(readList);
 //		SequenceGenerator sg = new SequenceGenerator(graph);
 //		sg.traverseGraph();
-    	
-    	// job start
-    	long startTime = System.nanoTime();
-    	
-    	assembleRead();
-//    	Analyze();
-
-    	long endTime = System.nanoTime();
-    	long lTime = endTime - startTime;
-    	System.out.println("Overall TIME : " + lTime/1000000.0 + " (ms)");
-    	System.out.println("Done.");
     }
 
     /**
@@ -56,34 +74,27 @@ public class App
      */
     private static void assembleRead() {
     	ArrayList<Sequence> readList = null;
-
+    	FastaReader reader = new FastaReader(Preference.INPUT_READ_PATH);
 		try {
-			FastaReader reader = new FastaReader("/data1/yjseo/data/read/NC_014034_d70_e0_single/NC_014034_l150_d70_e0_single.bwa.read1.fgs.faa");
-    		readList = reader.read();
-    		reader = new FastaReader("/data1/yjseo/data/read/NC_015214_d30_e0_single/NC_015214_l150_d30_e0_single.bwa.read1.fgs.faa");
-    		readList.addAll(reader.read());
-    		reader = new FastaReader("/data1/yjseo/data/read/NC_017340_d80_e0_single/NC_017340_l150_d80_e0_single.bwa.read1.fgs.faa");
-    		readList.addAll(reader.read());
-    		reader = new FastaReader("/data1/yjseo/data/read/NC_018140_d100_e0_single/NC_018140_l150_d100_e0_single.bwa.read1.fgs.faa");
-    		readList.addAll(reader.read());
-    		reader = new FastaReader("/data1/yjseo/data/read/NC_018936_d50_e0_single/NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa");
-    		readList.addAll(reader.read());
-//    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Streptococcus_pyogenes_A20_uid178106/NC_018936_ffn_single.bwa.read1.fasta.fgs.faa");
+//			FastaReader reader = new FastaReader("/data1/yjseo/data/read/NC_014034_d70_e0_single/NC_014034_l150_d70_e0_single.bwa.read1.fgs.faa");
 //    		readList = reader.read();
-    		
-//    		FastaReader reader = new FastaReader("/data1/yjseo/20170202/Staphylococcus_aureus_04_02981_uid161969/NC_017340_ffn_single.bwa.read1.fasta.fgs.faa");
-//    		seqList = reader.read();
-//    		seqList.addAll(reader.read());
-//    		FastaReader reader = new FastaReader("/data2/db/ncbi/bacteria_150414/all_faa/Clostridium_difficile_630_uid57679/NC_009089.faa");
-//    		seqList = reader.read();
-//    		seqList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/data/read/NC_015214_d30_e0_single/NC_015214_l150_d30_e0_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/data/read/NC_017340_d80_e0_single/NC_017340_l150_d80_e0_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/data/read/NC_018140_d100_e0_single/NC_018140_l150_d100_e0_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+//    		reader = new FastaReader("/data1/yjseo/data/read/NC_018936_d50_e0_single/NC_018936_l150_d50_e0_single.bwa.read1.fgs.faa");
+//    		readList.addAll(reader.read());
+			
+			readList = reader.read();
 			
 			// simplified graph method
 			Graph graph = GraphGenerator.generate(readList);
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();
-			FastaWriter bw = new FastaWriter("/data1/yjseo/20170331/bacteria5.asb.faa");
+			FastaWriter bw = new FastaWriter(Preference.OUTPUT_ASB_PATH);
 			for(Sequence seq: seqList) {
 				bw.write(seq);
 			}
@@ -94,17 +105,24 @@ public class App
 			e.printStackTrace();
 		}
     }
+   
+    /**
+     * Local Blast DB search
+     */
+    private static void searchBlastWithDB() {
+		Blast blast = new Blast(Preference.OUTPUT_ASB_PATH);
+		blast.runBlast();
+    }
   
     /**
      * Assembled sequence analysis 
      * @throws IOException 
      */
-    private static void Analyze() {
+    private static void analyze() {
     	
 		try {
 			// assembled sequence
-	    	String afileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\NC_018936.sequence.asb.faa";
-	    	FastaReader afr = new FastaReader(afileName);
+	    	FastaReader afr = new FastaReader(Preference.OUTPUT_ASB_PATH);
 	    	List<Sequence> assembleList;
 			assembleList = afr.read();
 			
@@ -113,21 +131,20 @@ public class App
 	    		assembleMap.put(seq.getHeader(), seq);
 	    	
 	    	// reference sequence
-	    	String rfileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170316\\NC_018936.faa";
-	    	FastaReader rfr = new FastaReader(rfileName);
+	    	FastaReader rfr = new FastaReader(Preference.INPUT_BLASTDB_PATH);
 	    	List<Sequence> referenceList = rfr.read();
 	    	HashMap<String, Sequence> referenceMap = new HashMap<String, Sequence>();
 	    	for(Sequence seq: referenceList)
 	    		referenceMap.put(seq.getHeader(), seq);
 	    	
 	    	// blast result
-	    	String fileName = "F:\\Dropbox\\DNA\\20160929_SPA\\20170323\\NC_018936_seq_blastp+.out";
-	    	BlastReader br = new BlastReader(fileName);
+	    	BlastReader br = new BlastReader(Preference.OUTPUT_BLAST_PATH);
 	    	List<BlastResult> bList = br.readTable();
 	    	
 			// Analysis
 	    	Analysis analysis = new Analysis(referenceMap, assembleMap, bList);
 	    	analysis.analyze();
+	    	analysis.writeBlastResult();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -188,6 +205,7 @@ public class App
     	return graph;
     }
     
+    @Deprecated
     private static void printVertexOrderedByCoverage(Graph graph) throws IOException {
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Streptococcus_pyogenes_A20_uid178106_edge.out"));
 //    	BufferedWriter bw = new BufferedWriter(new FileWriter("/home/yjseo/temp/Staphylococcus_aureus_04_02981_uid161969_edge.out"));
@@ -210,6 +228,7 @@ public class App
     	bw.close();
     }
     
+    @Deprecated
     private static void traverseGraph(Graph graph) throws IOException {
     	// find seed
 //    	List<Vertex> seeds = graph.getSeedVertex();
@@ -256,6 +275,7 @@ public class App
     	bw.close();
     }
     
+    @Deprecated
     private static Vertex getSeed(Graph graph) {
     	Vertex seed = null;
     	Iterator<Vertex> iter = graph.getVertexMap().values().iterator();
@@ -270,7 +290,7 @@ public class App
     	return seed;
     }
     
-    
+    @Deprecated
     private static ArrayList<Sequence> makeTargetSequence() throws IOException {
     	File dir = new File("/data2/db/ncbi/bacteria_150414/all_faa");
     	HashSet<String> speciesName = new HashSet<String>();

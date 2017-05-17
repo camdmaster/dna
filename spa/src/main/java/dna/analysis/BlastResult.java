@@ -14,6 +14,11 @@ public class BlastResult {
 	private int endReference;
 	private double evalue;
 	private double bitscore;
+	private double lengthQuery;
+	private double lengthReference;
+	private double coverageQuery;
+	private double coverageReference;
+	private String matchedString;
 	
 	public BlastResult() {
 		
@@ -113,6 +118,46 @@ public class BlastResult {
 
 	public void setBitscore(double bitscore) {
 		this.bitscore = bitscore;
+	}
+
+	public String getMatchedString() {
+		return matchedString;
+	}
+
+	public double getLengthQuery() {
+		return lengthQuery;
+	}
+
+	public void setLengthQuery(double lengthQuery) {
+		this.lengthQuery = lengthQuery;
+	}
+
+	public double getLengthReference() {
+		return lengthReference;
+	}
+
+	public void setLengthReference(double lengthReference) {
+		this.lengthReference = lengthReference;
+	}
+
+	public double getCoverageQuery() {
+		return coverageQuery;
+	}
+
+	public void setCoverageQuery(double coverageQuery) {
+		this.coverageQuery = coverageQuery;
+	}
+
+	public double getCoverageReference() {
+		return coverageReference;
+	}
+
+	public void setCoverageReference(double coverageReference) {
+		this.coverageReference = coverageReference;
+	}
+
+	public void setMatchedString(String matchedString) {
+		this.matchedString = matchedString;
 	}
 	
 }
