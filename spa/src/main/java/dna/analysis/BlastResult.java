@@ -14,8 +14,8 @@ public class BlastResult {
 	private int endReference;
 	private double evalue;
 	private double bitscore;
-	private double lengthQuery;
-	private double lengthReference;
+	private int lengthQuery;
+	private int lengthReference;
 	private double coverageQuery;
 	private double coverageReference;
 	private String matchedString;
@@ -124,19 +124,19 @@ public class BlastResult {
 		return matchedString;
 	}
 
-	public double getLengthQuery() {
+	public int getLengthQuery() {
 		return lengthQuery;
 	}
 
-	public void setLengthQuery(double lengthQuery) {
+	public void setLengthQuery(int lengthQuery) {
 		this.lengthQuery = lengthQuery;
 	}
 
-	public double getLengthReference() {
+	public int getLengthReference() {
 		return lengthReference;
 	}
 
-	public void setLengthReference(double lengthReference) {
+	public void setLengthReference(int lengthReference) {
 		this.lengthReference = lengthReference;
 	}
 

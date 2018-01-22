@@ -13,21 +13,24 @@ import dna.spa.Sequence;
 public class Graph {
 	
 	HashMap<String, Vertex> vertexMap;
-	HashMap<String, Edge> edgeMap;
-	List<Sequence> readList;
+	List<Edge> edgeList;
+//	HashMap<String, Edge> edgeMap;
+//	List<Sequence> readList;
 	
-	public Graph(List<Sequence> readList) {
+	public Graph() {
 		vertexMap = new HashMap<String, Vertex>();
-		edgeMap = new HashMap<String, Edge>();
-		this.readList = readList;
+		edgeList = new ArrayList<Edge>();
+//		edgeMap = new HashMap<String, Edge>();
+//		this.readList = readList;
 	}
 	
-	public void addVertex(Vertex vertex) {
-		vertexMap.put(vertex.getString(), vertex);
+	public void addVertex(String key, Vertex vertex) {
+		vertexMap.put(key, vertex);
 	}
 	
 	public void addEdge(Edge edge) {
-		edgeMap.put(edge.getString(), edge);
+		edgeList.add(edge);
+//		edgeMap.put(key, edge);
 	}
 	
 	public boolean existVertex(String string) {
@@ -48,12 +51,12 @@ public class Graph {
 		return vertexMap;
 	}
 
-	public boolean existEdge(String string) {
-		if(edgeMap.containsKey(string))
-			return true;
-		else
-			return false;
-	}
+//	public boolean existEdge(String string) {
+//		if(edgeMap.containsKey(string))
+//			return true;
+//		else
+//			return false;
+//	}
 	
 	public void addVertexCoverage(String string) {
 		if(vertexMap.containsKey(string)) {
@@ -62,11 +65,19 @@ public class Graph {
 		}
 	}
 	
-	public void addEdgeCoverage(String string) {
-		if(edgeMap.containsKey(string)) {
-			Edge e = edgeMap.get(string);
-			e.addCoverage();
-		}
+//	public void addEdgeCoverage(String string) {
+//		if(edgeMap.containsKey(string)) {
+//			Edge e = edgeMap.get(string);
+//			e.addCoverage();
+//		}
+//	}
+	
+	public Edge getEdge(Vertex v1, Vertex v2) {
+		for(Edge e1: v1.getEdgeList())
+			for(Edge e2: v2.getEdgeList())
+				if(e1.equals(e2))
+					return e1;
+		return null;
 	}
 	
 	public void setFValue() {
@@ -84,11 +95,13 @@ public class Graph {
 			Vertex v = iter.next();
 			v.visited = false;
 		}
-		Iterator<Edge> iter2 = edgeMap.values().iterator();
-		while(iter2.hasNext()) {
-			Edge e = iter2.next();
+		for(Edge e: edgeList)
 			e.visited = false;
-		}
+//		Iterator<Edge> iter2 = edgeMap.values().iterator();
+//		while(iter2.hasNext()) {
+//			Edge e = iter2.next();
+//			e.visited = false;
+//		}
 	}
 	
 	public List<Vertex> getSeedVertex() {
@@ -113,8 +126,8 @@ public class Graph {
 	}
 	
 	public List<Edge> getEdgeList() {
-		List<Edge> list = new ArrayList<Edge>(edgeMap.values());
-		return list;
+//		List<Edge> list = new ArrayList<Edge>(edgeMap.values());
+		return edgeList;
 	}
 	
 	/**
@@ -205,8 +218,8 @@ public class Graph {
 	}
 	
 	public void removeVisitedGraph() {
-		List<Edge> elist = new ArrayList<Edge>(edgeMap.values());
-		for(Edge e: elist) {
+//		List<Edge> elist = new ArrayList<Edge>(edgeMap.values());
+		for(Edge e: edgeList) {
 			if(e.visited)
 				removeEdge(e);
 //				edgeMap.remove(e.getString());
@@ -222,7 +235,7 @@ public class Graph {
 	}
 	
 	public void removeEdge(Edge edge) {
-		edgeMap.remove(edge.getString());
+		edgeList.remove(edge.getString());
 		edge.getV1().removeEdge(edge);
 		edge.getV2().removeEdge(edge);
 	}

@@ -37,6 +37,10 @@ public class Vertex implements Comparable<Vertex> {
 	public int getCoverage() {
 		return coverage;
 	}
+	
+	public void setCoverage(int coverage) {
+		this.coverage = coverage;
+	}
 
 	public ArrayList<Edge> getEdgeList() {
 		return edgeList;

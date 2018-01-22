@@ -4,17 +4,18 @@ import java.util.List;
 
 public class SimplifiedEdge {
 
-	List<Vertex> sequence;
+	List<Edge> sequence;
 	private SimplifiedVertex v1;
 	private SimplifiedVertex v2;
 	public boolean visited_seed;
 	public boolean visited_traversal;
+	public boolean judged;
 	
-	public SimplifiedEdge(List<Vertex> sequence) {
+	public SimplifiedEdge(List<Edge> sequence) {
 		this.sequence = sequence;
 	}
 
-	public List<Vertex> getSequence() {
+	public List<Edge> getEdgeList() {
 		return sequence;
 	}
 

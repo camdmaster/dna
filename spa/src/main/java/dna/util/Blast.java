@@ -24,8 +24,8 @@ public class Blast {
 	
 	public Blast(List<Sequence> queryList) {
 		evalue = 1;
-		threads = 4;
-		outfmt = 5;
+		threads = 10;
+		outfmt = 6;
 		this.querySeqList = queryList;
 		searchDB = true;
 	}
@@ -39,7 +39,7 @@ public class Blast {
 	public Blast(String queryPath) {
 		this.queryPath = queryPath;
 		evalue = 1;
-		threads = 64;
+		threads = 10;
 		outfmt = 6;
 		searchDB = true;
 	}
@@ -84,10 +84,10 @@ public class Blast {
 		String command;
 		if(searchDB) {
 			command = Preference.BLAST_PLUS_PATH + blastp + " -query " + queryPath + " -db " + Preference.INPUT_BLASTDB_PATH +
-			" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -max_target_seqs 1 -num_threads " + threads;			
+			" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -max_target_seqs 500 -num_threads " + threads;			
 		} else {
 			command = Preference.BLAST_PLUS_PATH + blastp + " -query " + queryPath + " -subject " + subjectPath +
-					" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -max_target_seqs 1 -num_threads " +threads;	
+					" -out " + outPath + " -evalue " + evalue + " -outfmt " + outfmt + " -max_target_seqs 500 -num_threads " +threads;	
 		}
 
 		
