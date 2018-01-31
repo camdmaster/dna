@@ -35,21 +35,8 @@ public class App
 	
     public static void main( String[] args )
     {    	
-    	// set IO path
-//    	Preference.INPUT_READ_PATH = "/data1/yjseo/data_spa/ds3/fnn_collection/wgsim_0/spa_wgsim_read1_ds3.fgs.faa";
-    	Preference.INPUT_READ_PATH = "/data1/yjseo/data_spa/ds3/fnn_collection/wgsim_0/NC_006814.read1.fgs.faa";
-//    	Preference.INPUT_READ_PATH = "/data1/yjseo/data/read/NC_014034_d70_e0_single/NC_014034_l150_d70_e0_single.bwa.read1.fgs.faa";
-//    	Preference.INPUT_READ_PATH = "/data1/yjseo/20170531/58337314.faa";
-    	Preference.INPUT_BLASTDB_PATH = "/data1/yjseo/data_spa/ds3/faa_collection/NC_006814.cluster.faa";
-    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20180122/NC_006814.asb.faa";
-    	Preference.OUTPUT_ASB_CLUSTER_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.faa";
-//    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20170531/58337314.asb.faa";
-    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.blast.out";
-    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.analysis.out";
-    	Preference.OUTPUT_LOG_PATH = "/data1/yjseo/20180122/NC_006814.log";
-    	
-//    	Preference.INPUT_READ_PATH = "/data1/yjseo/dj3/DJ3_1_trim.fasta.fgs.faa";
-//    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20170524/dj3.asb.faa";
+//    	readLinuxPreferences();
+    	readWindowsPreferences();
     	
     	// job start
     	long startTime = System.nanoTime();
@@ -97,6 +84,28 @@ public class App
 //		Graph graph = GraphGenerator.generate(readList);
 //		SequenceGenerator sg = new SequenceGenerator(graph);
 //		sg.traverseGraph();
+    }
+    
+    private static void readLinuxPreferences() {
+    	// set IO path
+    	Preference.INPUT_READ_PATH = "/data1/yjseo/data_spa/ds3/fnn_collection/wgsim_0/NC_006814.read1.fgs.faa";
+    	Preference.INPUT_BLASTDB_PATH = "/data1/yjseo/data_spa/ds3/faa_collection/NC_006814.cluster.faa";
+    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20180122/NC_006814.asb.faa";
+    	Preference.OUTPUT_ASB_CLUSTER_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.faa";
+    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.blast.out";
+    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.analysis.out";
+    	Preference.OUTPUT_LOG_PATH = "/data1/yjseo/20180122/NC_006814.log";
+    }
+    
+    private static void readWindowsPreferences() {
+    	// set IO path
+    	Preference.INPUT_READ_PATH = "F:\\Dropbox\\DNA\\20160929_SPA\\20180131\\NC_006814_test.read1.fgs.faa";
+    	Preference.INPUT_BLASTDB_PATH = "/data1/yjseo/data_spa/ds3/faa_collection/NC_006814.cluster.faa";
+    	Preference.OUTPUT_ASB_PATH = "F:\\Dropbox\\DNA\\20160929_SPA\\20180131\\out.asb.faa";
+    	Preference.OUTPUT_ASB_CLUSTER_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.faa";
+    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.blast.out";
+    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.analysis.out";
+    	Preference.OUTPUT_LOG_PATH = "F:\\Dropbox\\DNA\\20160929_SPA\\20180131\\NC_006814.log";
     }
     
     private static void checkCoverageReadRef() throws IOException {
@@ -208,7 +217,7 @@ public class App
 //    	for(Sequence seq: seqList) {
 //    		List<Sequence> s = new ArrayList<Sequence>();
 //    		s.add(seq);
-    		Graph graph =  GraphGenerator.generate(seqList);
+    		Graph graph =  GraphGenerator.generate(seqList, Preference.VERTEX_SIZE);
     		Iterator<Vertex> iter = graph.getVertexMap().values().iterator();
     		while(iter.hasNext()) {
     			Vertex v = iter.next();
@@ -240,16 +249,16 @@ public class App
         	assembleRead(readList);
         	System.out.println();
         	
-        	runCDHIT();
-        	
-        	System.out.println("<< Blast >>");
-        	Preference.LOG += "<< Blast >>\r\n";
-        	searchBlastWithDB();
-        	System.out.println();
-        	
-        	System.out.println("<< Analysis >>");
-        	Preference.LOG += "<< Analysis >>\r\n";
-        	analyze();
+//        	runCDHIT();
+//        	
+//        	System.out.println("<< Blast >>");
+//        	Preference.LOG += "<< Blast >>\r\n";
+//        	searchBlastWithDB();
+//        	System.out.println();
+//        	
+//        	System.out.println("<< Analysis >>");
+//        	Preference.LOG += "<< Analysis >>\r\n";
+//        	analyze();
         	
         	BufferedWriter bw = new BufferedWriter(new FileWriter(Preference.OUTPUT_LOG_PATH));
         	bw.write(Preference.LOG);
@@ -467,7 +476,7 @@ public class App
 			Preference.LOG += "Read size:" + readList.size() + "\r\n";
 			
 			// simplified graph method
-			Graph graph = GraphGenerator.generate(readList);
+			Graph graph = GraphGenerator.generate(readList, Preference.VERTEX_SIZE);
 			Assembly_SimpleGraphMethod assembly = new Assembly_SimpleGraphMethod(graph);
 			assembly.makeGraph();
 			List<Sequence> seqList = assembly.getAssembledSequences();

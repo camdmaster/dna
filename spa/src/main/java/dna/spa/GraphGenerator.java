@@ -60,12 +60,12 @@ public class GraphGenerator {
     	return vertexMap;
 	}
 	
-	public static Graph generate(List<Sequence> sequenceList) {
+	public static Graph generate(List<Sequence> sequenceList, int kmerSize) {
 		long startTime = System.nanoTime();
 		System.out.println("<Graph Generation>");
     	// make graph
     	Graph graph = new Graph();
-    	int vertexLength = Preference.VERTEX_SIZE;
+    	int vertexLength = kmerSize;
     	int edgeLength = vertexLength + 1;
     	
     	int seqSize = sequenceList.size();

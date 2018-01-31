@@ -14,6 +14,7 @@ import dna.graph.SimplifiedEdge;
 import dna.graph.SimplifiedGraph;
 import dna.graph.SimplifiedVertex;
 import dna.graph.Vertex;
+import dna.spa.GraphGenerator;
 import dna.spa.Preference;
 import dna.spa.Sequence;
 import dna.spa.io.BlastReader;
@@ -237,6 +238,8 @@ public class Assembly_SimpleGraphMethod {
 				System.out.println("false negative SV: " + sv.getVertex().getString());
 		}
 		
+		divideAndReconnectTerminal();
+		
 		return;
 	}
 	
@@ -249,6 +252,74 @@ public class Assembly_SimpleGraphMethod {
 				repeatCount++;
 		}
 		System.out.println("repeat region count: " + repeatCount);
+	}
+	
+	/**
+	 *  Proc 3-1. divide terminal simplified vertex to small k-mer
+	 */
+	private void divideAndReconnectTerminal() {
+		List<SimplifiedEdge> sEdgeList = simplifiedGraph.getSEdgeList();
+		List<SimplifiedEdge> v1TerminalList = new ArrayList<SimplifiedEdge>();
+		List<SimplifiedEdge> v2TerminalList = new ArrayList<SimplifiedEdge>();
+		
+		// divide terminal
+		for(SimplifiedEdge se: sEdgeList) {
+			if(se.getV1() == null) {
+				List<Edge> edgeList = se.getEdgeList();
+				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(0));
+				edgeList.remove(0);
+				edgeList.addAll(0, smallEdgeList);
+				v1TerminalList.add(se);
+			}
+			if(se.getV2() == null) {
+				List<Edge> edgeList = se.getEdgeList();
+				int lastIndex = edgeList.size() - 1;
+				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(lastIndex));
+				edgeList.remove(lastIndex);
+				edgeList.addAll(smallEdgeList);
+				v2TerminalList.add(se);
+			}
+		}
+		
+		// reconnect
+		for(SimplifiedEdge seRight: v1TerminalList) {
+			for(SimplifiedEdge seLeft: v2TerminalList) {
+				reconnect(seLeft, seRight);
+			}
+		}
+	}
+	
+	/**
+	 * Proc 3-2. divide simplified vertex
+	 * @param sVertex
+	 */
+	private List<Edge> divideToSmallEdges(Edge edge) {
+		int kmerLength = 12;
+		Sequence seq = new Sequence(edge.getString());
+		List<Sequence> seqList = new ArrayList<Sequence>();
+		seqList.add(seq);
+		Graph graph = GraphGenerator.generate(seqList, kmerLength);
+		return graph.getEdgeList();
+	}
+	
+	private void reconnect(SimplifiedEdge seLeft, SimplifiedEdge seRight) {
+		int size = 14;
+		List<Edge> leftEdgeList = seLeft.getEdgeList();
+		List<Edge> rightEdgeList = seRight.getEdgeList();
+		int leftLastIndex = leftEdgeList.size() - 1;
+		Edge edgeR = rightEdgeList.get(0);
+		List<Edge> tempEdgeList = new ArrayList<Edge>();
+		for(int j=leftLastIndex; j>leftLastIndex - size; j--) {
+			Edge edgeL = leftEdgeList.get(j);
+			tempEdgeList.add(edgeL);
+			if(edgeR.getString().equals(edgeL.getString())) {
+				leftEdgeList.removeAll(tempEdgeList);
+				leftEdgeList.addAll(rightEdgeList);
+				seLeft.setV2(seRight.getV2());
+				simplifiedGraph.removeEdge(seRight);
+				return;
+			}
+		}
 	}
 	
 	/**
