@@ -14,7 +14,6 @@ import dna.graph.SimplifiedEdge;
 import dna.graph.SimplifiedGraph;
 import dna.graph.SimplifiedVertex;
 import dna.graph.Vertex;
-import dna.spa.GraphGenerator;
 import dna.spa.Preference;
 import dna.spa.Sequence;
 import dna.spa.io.BlastReader;
@@ -201,7 +200,7 @@ public class Assembly_SimpleGraphMethod {
 	 * Proc 3.
 	 */
 	private void organizeGraph() {
-		List<SimplifiedEdge> tempSEdge = new ArrayList<SimplifiedEdge>();
+//		List<SimplifiedEdge> tempSEdge = new ArrayList<SimplifiedEdge>();
 		for(SimplifiedEdge sEdge: simplifiedGraph.getSEdgeList()) {
 			List<Edge> edgeList = sEdge.getEdgeList();
 			Vertex branchV1 = edgeList.get(0).getV1();
@@ -210,14 +209,14 @@ public class Assembly_SimpleGraphMethod {
 			SimplifiedVertex svx2 = simplifiedGraph.getSVertex(branchV2);
 			
 			if(svx1 == null && svx2 == null) {
-				String seqString = getSequenceString(edgeList);
-				if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
-					assembledNum++;
-					String header = "nobranch_" + assembledNum;
-					Sequence sequence = new Sequence(header, seqString);
-					this.assembledSequences.add(sequence);	
-				}
-				tempSEdge.add(sEdge);
+//				String seqString = getSequenceString(edgeList);
+//				if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
+//					assembledNum++;
+//					String header = "nobranch_" + assembledNum;
+//					Sequence sequence = new Sequence(header, seqString);
+//					this.assembledSequences.add(sequence);	
+//				}
+//				tempSEdge.add(sEdge);
 			} else {
 				if(svx1 != null) {
 					svx1.addSEdge(sEdge);
@@ -230,8 +229,8 @@ public class Assembly_SimpleGraphMethod {
 			}
 		}
 		
-		for(SimplifiedEdge e: tempSEdge)
-			simplifiedGraph.removeEdge(e);
+//		for(SimplifiedEdge e: tempSEdge)
+//			simplifiedGraph.removeEdge(e);
 		
 		for(SimplifiedVertex sv: simplifiedGraph.getSVertexList()) {
 			if(sv.getEdgeList().size() == 0)
@@ -259,32 +258,38 @@ public class Assembly_SimpleGraphMethod {
 	 */
 	private void divideAndReconnectTerminal() {
 		List<SimplifiedEdge> sEdgeList = simplifiedGraph.getSEdgeList();
-		List<SimplifiedEdge> v1TerminalList = new ArrayList<SimplifiedEdge>();
-		List<SimplifiedEdge> v2TerminalList = new ArrayList<SimplifiedEdge>();
+		List<SimplifiedEdge> leftTerminalList = new ArrayList<SimplifiedEdge>();
+		List<SimplifiedEdge> rightTerminalList = new ArrayList<SimplifiedEdge>();
+		List<List<Edge>> leftTerminalSmallEdgesList = new ArrayList<List<Edge>>();
+		List<List<Edge>> rightTerminalSmallEdgesList = new ArrayList<List<Edge>>();
 		
 		// divide terminal
 		for(SimplifiedEdge se: sEdgeList) {
 			if(se.getV1() == null) {
 				List<Edge> edgeList = se.getEdgeList();
 				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(0));
-				edgeList.remove(0);
-				edgeList.addAll(0, smallEdgeList);
-				v1TerminalList.add(se);
+//				edgeList.remove(0);
+//				edgeList.addAll(0, smallEdgeList);
+				leftTerminalList.add(se);
+				leftTerminalSmallEdgesList.add(smallEdgeList);
 			}
 			if(se.getV2() == null) {
 				List<Edge> edgeList = se.getEdgeList();
 				int lastIndex = edgeList.size() - 1;
 				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(lastIndex));
-				edgeList.remove(lastIndex);
-				edgeList.addAll(smallEdgeList);
-				v2TerminalList.add(se);
+//				edgeList.remove(lastIndex);
+//				edgeList.addAll(smallEdgeList);
+				rightTerminalList.add(se);
+				rightTerminalSmallEdgesList.add(smallEdgeList);
 			}
 		}
 		
 		// reconnect
-		for(SimplifiedEdge seRight: v1TerminalList) {
-			for(SimplifiedEdge seLeft: v2TerminalList) {
-				reconnect(seLeft, seRight);
+		for(int i=0; i<leftTerminalList.size(); i++) {
+			for(int j=0; j<rightTerminalList.size(); j++) {
+				if(leftTerminalList.get(i) != rightTerminalList.get(j))
+					reconnect(leftTerminalList.get(i), rightTerminalList.get(j),
+							leftTerminalSmallEdgesList.get(i), rightTerminalSmallEdgesList.get(j));
 			}
 		}
 	}
@@ -294,41 +299,107 @@ public class Assembly_SimpleGraphMethod {
 	 * @param sVertex
 	 */
 	private List<Edge> divideToSmallEdges(Edge edge) {
+		List<Edge> edgeList = new ArrayList<Edge>();
 		int kmerLength = 12;
-		Sequence seq = new Sequence(edge.getString());
-		List<Sequence> seqList = new ArrayList<Sequence>();
-		seqList.add(seq);
-		Graph graph = GraphGenerator.generate(seqList, kmerLength);
-		return graph.getEdgeList();
+		int edgeLength = kmerLength + 1;
+		
+		String seq = edge.getString();
+		int length = seq.length();
+		for(int i=0; i<length-kmerLength; i++) {
+			String edgeSeq = seq.substring(i, i+edgeLength);
+			Edge tmpEdge = new Edge(null, null, edgeSeq);
+			edgeList.add(tmpEdge);
+		}
+		
+		return edgeList;
+		
+//		Sequence seq = new Sequence(edge.getString());
+//		List<Sequence> seqList = new ArrayList<Sequence>();
+//		seqList.add(seq);
+//		Graph graph = GraphGenerator.generate(seqList, kmerLength);
+//		return graph.getEdgeList();
 	}
 	
-	private void reconnect(SimplifiedEdge seLeft, SimplifiedEdge seRight) {
-		int size = 14;
-		List<Edge> leftEdgeList = seLeft.getEdgeList();
-//		if(leftEdgeList.size() < 14) {
-//			System.out.println("count left: " + leftEdgeList.size());
-//		}
-		List<Edge> rightEdgeList = seRight.getEdgeList();
-		int leftLastIndex = leftEdgeList.size() - 1;
-		Edge edgeR = rightEdgeList.get(0);
-		List<Edge> tempEdgeList = new ArrayList<Edge>();
-		for(int j=leftLastIndex; j>leftLastIndex - size; j--) {
-			Edge edgeL = leftEdgeList.get(j);
-			tempEdgeList.add(edgeL);
-			if(edgeR.getString().equals(edgeL.getString())) {
-				leftEdgeList.removeAll(tempEdgeList);
-				leftEdgeList.addAll(rightEdgeList);
-				seLeft.setV2(seRight.getV2());
-				simplifiedGraph.removeEdge(seRight);
-				return;
-			}
+	private void reconnect(SimplifiedEdge leftTerminal, SimplifiedEdge rightTerminal, List<Edge> leftSmallEdges, List<Edge> rightSmallEdges) {
+		List<Edge> bridgeEdgeList = new ArrayList<Edge>();
+		int kmerLength = 12;
+		int edgeLength = kmerLength + 1;
+		Edge rightSmallEnd = rightSmallEdges.get(rightSmallEdges.size()-1);
+		for(int i=0; i<leftSmallEdges.size(); i++) {
+			Edge leftSmall = leftSmallEdges.get(i);
+			if(leftSmall.getString().equals(rightSmallEnd.getString())) {
+				String leftTerminalString = leftTerminal.getEdgeList().get(0).getString();
+				leftTerminalString = leftTerminalString.substring(i+edgeLength, leftTerminalString.length()-1);
+				String rightTerminalString = rightTerminal.getEdgeList().get(rightTerminal.getEdgeList().size()-1).getString().substring(1);
+				String bridgeString = rightTerminalString + leftTerminalString;
+				for(int j=0; j<bridgeString.length()-Preference.VERTEX_SIZE; j++) {
+					String newEdgeString = bridgeString.substring(j, j+Preference.VERTEX_SIZE+1);
+					Edge tmpEdge = new Edge(null, null, newEdgeString);
+					bridgeEdgeList.add(tmpEdge);
+				}
+				
+				List<Edge> completeEdgeList = rightTerminal.getEdgeList();
+				completeEdgeList.addAll(bridgeEdgeList);
+				completeEdgeList.addAll(leftTerminal.getEdgeList());
+				
+				SimplifiedVertex svx2 = leftTerminal.getV2();
+				if(svx2 != null) {
+					rightTerminal.setV2(leftTerminal.getV2());
+					svx2.addSEdge(rightTerminal);
+				}
+				this.simplifiedGraph.removeEdge(leftTerminal);
+				
+			} 
 		}
+		
+//		int size = 14;
+//		List<Edge> leftEdgeList = seLeft.getEdgeList();
+//		List<Edge> rightEdgeList = seRight.getEdgeList();
+//		int leftLastIndex = leftEdgeList.size() - 1;
+//		Edge edgeR = leftSmallEdges.get(0);
+//		List<Edge> tempEdgeList = new ArrayList<Edge>();
+//		for(int j=leftLastIndex; j>leftLastIndex - size; j--) {
+//			Edge edgeL = leftEdgeList.get(j);
+//			tempEdgeList.add(edgeL);
+//			if(edgeR.getString().equals(edgeL.getString())) {
+//				leftEdgeList.removeAll(tempEdgeList);
+//				leftEdgeList.addAll(rightEdgeList);
+//				seLeft.setV2(seRight.getV2());
+//				simplifiedGraph.removeEdge(seRight);
+//				return;
+//			}
+//		}
 	}
 	
 	/**
 	 * Proc 4.
 	 */
 	private void dfs() {
+		
+		// print single string sequence
+		List<SimplifiedEdge> tempSEdge = new ArrayList<SimplifiedEdge>();
+		for(SimplifiedEdge sEdge: simplifiedGraph.getSEdgeList()) {
+			List<Edge> edgeList = sEdge.getEdgeList();
+			Vertex branchV1 = edgeList.get(0).getV1();
+			Vertex branchV2 = edgeList.get(edgeList.size()-1).getV2();			
+			SimplifiedVertex svx1 = simplifiedGraph.getSVertex(branchV1);
+			SimplifiedVertex svx2 = simplifiedGraph.getSVertex(branchV2);
+			if(svx1 == null && svx2 == null) {
+				String seqString = getSequenceString(edgeList);
+				if(seqString.length() >= Preference.CUTOFF_SEQUENCE_SIZE) {
+					assembledNum++;
+					String header = "nobranch_" + assembledNum;
+					Sequence sequence = new Sequence(header, seqString);
+					this.assembledSequences.add(sequence);	
+				}
+				tempSEdge.add(sEdge);
+			}
+		}
+		for(SimplifiedEdge e: tempSEdge)
+		simplifiedGraph.removeEdge(e);
+
+		
+		// print branch string sequence
 		List<SimplifiedEdge> seeds = simplifiedGraph.getSEdgeList();
 		for(int i=0; i<seeds.size(); i++) {
 			SimplifiedEdge seed = seeds.get(i);

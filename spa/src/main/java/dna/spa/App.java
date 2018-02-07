@@ -35,8 +35,8 @@ public class App
 	
     public static void main( String[] args )
     {    	
-    	readLinuxPreferences();
-//    	readWindowsPreferences();
+//    	readLinuxPreferences();
+    	readWindowsPreferences();
     	
     	// job start
     	long startTime = System.nanoTime();
@@ -257,16 +257,16 @@ public class App
         	assembleRead(readList);
         	System.out.println();
         	
-        	runCDHIT();
-        	
-        	System.out.println("<< Blast >>");
-        	Preference.LOG += "<< Blast >>\r\n";
-        	searchBlastWithDB();
-        	System.out.println();
-        	
-        	System.out.println("<< Analysis >>");
-        	Preference.LOG += "<< Analysis >>\r\n";
-        	analyze();
+//        	runCDHIT();
+//        	
+//        	System.out.println("<< Blast >>");
+//        	Preference.LOG += "<< Blast >>\r\n";
+//        	searchBlastWithDB();
+//        	System.out.println();
+//        	
+//        	System.out.println("<< Analysis >>");
+//        	Preference.LOG += "<< Analysis >>\r\n";
+//        	analyze();
         	
         	BufferedWriter bw = new BufferedWriter(new FileWriter(Preference.OUTPUT_LOG_PATH));
         	bw.write(Preference.LOG);
