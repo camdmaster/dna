@@ -305,6 +305,9 @@ public class Assembly_SimpleGraphMethod {
 	private void reconnect(SimplifiedEdge seLeft, SimplifiedEdge seRight) {
 		int size = 14;
 		List<Edge> leftEdgeList = seLeft.getEdgeList();
+//		if(leftEdgeList.size() < 14) {
+//			System.out.println("count left: " + leftEdgeList.size());
+//		}
 		List<Edge> rightEdgeList = seRight.getEdgeList();
 		int leftLastIndex = leftEdgeList.size() - 1;
 		Edge edgeR = rightEdgeList.get(0);
@@ -500,7 +503,7 @@ public class Assembly_SimpleGraphMethod {
 		List<SimplifiedEdge> tempList = new ArrayList<SimplifiedEdge>();
 		for(SimplifiedEdge edge: edgeList) {
 			edge.judged = true;
-			if(!edge.visited_traversal && !(isShort(edge) && isTerminal(edge)) && !isLowCoverage(edge)) {
+			if(!edge.visited_traversal && !(isShort(edge) && isTerminal(edge))){ //&& !isLowCoverage(edge)) {
 				if(!tempList.contains(edge))
 					tempList.add(edge);
 			} else

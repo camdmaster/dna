@@ -35,8 +35,8 @@ public class App
 	
     public static void main( String[] args )
     {    	
-//    	readLinuxPreferences();
-    	readWindowsPreferences();
+    	readLinuxPreferences();
+//    	readWindowsPreferences();
     	
     	// job start
     	long startTime = System.nanoTime();
@@ -90,11 +90,19 @@ public class App
     	// set IO path
     	Preference.INPUT_READ_PATH = "/data1/yjseo/data_spa/ds3/fnn_collection/wgsim_0/NC_006814.read1.fgs.faa";
     	Preference.INPUT_BLASTDB_PATH = "/data1/yjseo/data_spa/ds3/faa_collection/NC_006814.cluster.faa";
-    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20180122/NC_006814.asb.faa";
-    	Preference.OUTPUT_ASB_CLUSTER_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.faa";
-    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.blast.out";
-    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20180122/NC_006814.asb.cluster.analysis.out";
-    	Preference.OUTPUT_LOG_PATH = "/data1/yjseo/20180122/NC_006814.log";
+    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20180131/NC_006814.asb.faa";
+    	Preference.OUTPUT_ASB_CLUSTER_PATH = "/data1/yjseo/20180131/NC_006814.asb.cluster.faa";
+    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20180131/NC_006814.asb.cluster.blast.out";
+    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20180131/NC_006814.asb.cluster.analysis.out";
+    	Preference.OUTPUT_LOG_PATH = "/data1/yjseo/20180131/NC_006814.log";
+    	
+//    	Preference.INPUT_READ_PATH = "/data1/yjseo/data_spa/ds3/fnn_collection/wgsim_0/spa_wgsim_read1_ds3.fgs.faa";
+//    	Preference.INPUT_BLASTDB_PATH = "/data1/yjseo/data_spa/ds3/faa_collection/spa_ds3.cluster.faa";
+//    	Preference.OUTPUT_ASB_PATH = "/data1/yjseo/20180131/spa_ds3.asb.faa";
+//    	Preference.OUTPUT_ASB_CLUSTER_PATH = "/data1/yjseo/20180131/spa_ds3.asb.cluster.faa";
+//    	Preference.OUTPUT_BLAST_PATH = "/data1/yjseo/20180131/spa_ds3.asb.cluster.blast.out";
+//    	Preference.OUTPUT_ANALYSIS_PATH = "/data1/yjseo/20180131/spa_ds3.asb.cluster.analysis.out";
+//    	Preference.OUTPUT_LOG_PATH = "/data1/yjseo/20180131/spa_ds3.log";
     }
     
     private static void readWindowsPreferences() {
@@ -249,16 +257,16 @@ public class App
         	assembleRead(readList);
         	System.out.println();
         	
-//        	runCDHIT();
-//        	
-//        	System.out.println("<< Blast >>");
-//        	Preference.LOG += "<< Blast >>\r\n";
-//        	searchBlastWithDB();
-//        	System.out.println();
-//        	
-//        	System.out.println("<< Analysis >>");
-//        	Preference.LOG += "<< Analysis >>\r\n";
-//        	analyze();
+        	runCDHIT();
+        	
+        	System.out.println("<< Blast >>");
+        	Preference.LOG += "<< Blast >>\r\n";
+        	searchBlastWithDB();
+        	System.out.println();
+        	
+        	System.out.println("<< Analysis >>");
+        	Preference.LOG += "<< Analysis >>\r\n";
+        	analyze();
         	
         	BufferedWriter bw = new BufferedWriter(new FileWriter(Preference.OUTPUT_LOG_PATH));
         	bw.write(Preference.LOG);

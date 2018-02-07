@@ -62,7 +62,7 @@ public class GraphGenerator {
 	
 	public static Graph generate(List<Sequence> sequenceList, int kmerSize) {
 		long startTime = System.nanoTime();
-		System.out.println("<Graph Generation>");
+//		System.out.println("<Graph Generation>");
     	// make graph
     	Graph graph = new Graph();
     	int vertexLength = kmerSize;
@@ -75,7 +75,7 @@ public class GraphGenerator {
     		if(j%1000000==0 && j != 0) {
     			long endTime1 = System.nanoTime();
     	    	long lTime = endTime1 - startTime1;
-    	    	System.out.println(j + " TIME : " + lTime/1000000.0 + " (ms)" + ", vertex: " + graph.getVertexMap().size());
+//    	    	System.out.println(j + " TIME : " + lTime/1000000.0 + " (ms)" + ", vertex: " + graph.getVertexMap().size());
     	    	startTime1 = endTime1;
     		}
 //    	for(Sequence seq: sequenceList) {
@@ -131,9 +131,9 @@ public class GraphGenerator {
     	graph.setFValue();
     	
     	long endTime = System.nanoTime();
-    	System.out.println("Vertex size: " + graph.getVertexMap().size());
-    	System.out.println("Edge size: " + graph.getEdgeList().size());
-    	System.out.println("Graph TIME : " + (endTime - startTime) / 1000000.0 + " (ms)");
+//    	System.out.println("Vertex size: " + graph.getVertexMap().size());
+//    	System.out.println("Edge size: " + graph.getEdgeList().size());
+//    	System.out.println("Graph TIME : " + (endTime - startTime) / 1000000.0 + " (ms)");
     	
     	return graph;
 	}
