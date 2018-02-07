@@ -2,6 +2,8 @@ package dna.assembly;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -262,43 +264,58 @@ public class Assembly_SimpleGraphMethod {
 		List<SimplifiedEdge> rightTerminalList = new ArrayList<SimplifiedEdge>();
 		List<List<Edge>> leftTerminalSmallEdgesList = new ArrayList<List<Edge>>();
 		List<List<Edge>> rightTerminalSmallEdgesList = new ArrayList<List<Edge>>();
+		HashMap<String, Integer> leftEdgeMap = new HashMap<String, Integer>();
 		
 		// divide terminal
-		for(SimplifiedEdge se: sEdgeList) {
+		for(int i=0; i<sEdgeList.size(); i++) {
+			SimplifiedEdge se = sEdgeList.get(i);
 			if(se.getV1() == null) {
 				List<Edge> edgeList = se.getEdgeList();
-				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(0));
-//				edgeList.remove(0);
-//				edgeList.addAll(0, smallEdgeList);
+				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(0), leftTerminalList.size(), leftEdgeMap);
 				leftTerminalList.add(se);
 				leftTerminalSmallEdgesList.add(smallEdgeList);
 			}
 			if(se.getV2() == null) {
 				List<Edge> edgeList = se.getEdgeList();
 				int lastIndex = edgeList.size() - 1;
-				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(lastIndex));
-//				edgeList.remove(lastIndex);
-//				edgeList.addAll(smallEdgeList);
+				List<Edge> smallEdgeList = divideToSmallEdges(edgeList.get(lastIndex), i, null);
 				rightTerminalList.add(se);
 				rightTerminalSmallEdgesList.add(smallEdgeList);
 			}
 		}
 		
 		// reconnect
-		for(int i=0; i<leftTerminalList.size(); i++) {
-			for(int j=0; j<rightTerminalList.size(); j++) {
-				if(leftTerminalList.get(i) != rightTerminalList.get(j))
-					reconnect(leftTerminalList.get(i), rightTerminalList.get(j),
-							leftTerminalSmallEdgesList.get(i), rightTerminalSmallEdgesList.get(j));
+		HashSet<Integer> reconnectedIndex = new HashSet<Integer>();
+		for(int i=0; i<rightTerminalList.size(); i++) {
+			for(Edge e: rightTerminalSmallEdgesList.get(i)) {
+				String key = e.getString();
+				if(leftEdgeMap.containsKey(key)) {
+					int num = leftEdgeMap.get(key);
+					if(!leftTerminalList.get(num).equals(rightTerminalList.get(i)) && !reconnectedIndex.contains(num)) {
+						if(reconnect(leftTerminalList.get(num), rightTerminalList.get(i),
+								leftTerminalSmallEdgesList.get(num), rightTerminalSmallEdgesList.get(i))) {
+							reconnectedIndex.add(num);
+							break;
+						}
+					}
+				}
 			}
 		}
+//		for(int i=0; i<leftTerminalList.size(); i++) {
+//			for(int j=0; j<rightTerminalList.size(); j++) {
+//				if(leftTerminalList.get(i) != rightTerminalList.get(j)) {
+//					reconnect(leftTerminalList.get(i), rightTerminalList.get(j),
+//							leftTerminalSmallEdgesList.get(i), rightTerminalSmallEdgesList.get(j));
+//				}
+//			}
+//		}
 	}
 	
 	/**
 	 * Proc 3-2. divide simplified vertex
 	 * @param sVertex
 	 */
-	private List<Edge> divideToSmallEdges(Edge edge) {
+	private List<Edge> divideToSmallEdges(Edge edge, int number, HashMap<String, Integer> edgeMap) {
 		List<Edge> edgeList = new ArrayList<Edge>();
 		int kmerLength = 12;
 		int edgeLength = kmerLength + 1;
@@ -309,6 +326,8 @@ public class Assembly_SimpleGraphMethod {
 			String edgeSeq = seq.substring(i, i+edgeLength);
 			Edge tmpEdge = new Edge(null, null, edgeSeq);
 			edgeList.add(tmpEdge);
+			if(edgeMap != null)
+				edgeMap.put(tmpEdge.getString(), number);
 		}
 		
 		return edgeList;
@@ -320,7 +339,7 @@ public class Assembly_SimpleGraphMethod {
 //		return graph.getEdgeList();
 	}
 	
-	private void reconnect(SimplifiedEdge leftTerminal, SimplifiedEdge rightTerminal, List<Edge> leftSmallEdges, List<Edge> rightSmallEdges) {
+	private boolean reconnect(SimplifiedEdge leftTerminal, SimplifiedEdge rightTerminal, List<Edge> leftSmallEdges, List<Edge> rightSmallEdges) {
 		List<Edge> bridgeEdgeList = new ArrayList<Edge>();
 		int kmerLength = 12;
 		int edgeLength = kmerLength + 1;
@@ -348,9 +367,11 @@ public class Assembly_SimpleGraphMethod {
 					svx2.addSEdge(rightTerminal);
 				}
 				this.simplifiedGraph.removeEdge(leftTerminal);
-				
+				return true;
 			} 
 		}
+		
+		return false;
 		
 //		int size = 14;
 //		List<Edge> leftEdgeList = seLeft.getEdgeList();
